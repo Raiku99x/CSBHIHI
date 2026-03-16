@@ -245,11 +245,16 @@ function SubjectDetail({ subject, isEnrolled, userId, onBack, onToggle }) {
       if (mediaPosts.length === 0) return <EmptyState emoji="🖼️" text="No media shared yet" />
       return (
         <div className="grid grid-cols-3 gap-2">
-          {mediaPosts.map(p => (
-            <div key={p.id} className="aspect-square rounded-xl overflow-hidden bg-slate-100">
-              <img src={p.photo_url} className="w-full h-full object-cover" alt="" />
-            </div>
-          ))}
+          {mediaPosts.flatMap(p => {
+            let urls = []
+            try { const parsed = JSON.parse(p.photo_url); urls = Array.isArray(parsed) ? parsed : [p.photo_url] }
+            catch { urls = [p.photo_url] }
+            return urls.map((url, i) => (
+              <div key={`${p.id}-${i}`} className="aspect-square rounded-xl overflow-hidden bg-slate-100">
+                <img src={url} className="w-full h-full object-cover" alt="" />
+              </div>
+            ))
+          })}
         </div>
       )
     }
