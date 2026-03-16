@@ -183,9 +183,9 @@ function PhotoGrid({ photos, onPhotoClick }) {
 
   if (count === 2) {
     return (
-      <div className="grid grid-cols-2 gap-0.5 bg-slate-100" style={{ height: 260 }}>
+      <div className="grid grid-cols-2 gap-0.5 bg-slate-100">
         {display.map((url, i) => (
-          <div key={i} className="overflow-hidden" onClick={() => onPhotoClick(i)}>
+          <div key={i} className="overflow-hidden" style={{ aspectRatio: '1/1' }} onClick={() => onPhotoClick(i)}>
             <img src={url} className={imgCls} loading="lazy" alt={`Photo ${i + 1}`} />
           </div>
         ))}
@@ -196,8 +196,11 @@ function PhotoGrid({ photos, onPhotoClick }) {
   if (count === 3) {
     return (
       <div className="bg-slate-100" style={{
-        display: 'grid', gridTemplateColumns: '2fr 1fr',
-        gridTemplateRows: 'repeat(2, 1fr)', gap: 2, height: 280,
+        display: 'grid',
+        gridTemplateColumns: '2fr 1fr',
+        gridTemplateRows: '1fr 1fr',
+        gap: 2,
+        aspectRatio: '16/9',
       }}>
         <div style={{ gridRow: '1 / 3' }} className="overflow-hidden" onClick={() => onPhotoClick(0)}>
           <img src={display[0]} className={imgCls} loading="lazy" alt="Photo 1" />
@@ -213,7 +216,13 @@ function PhotoGrid({ photos, onPhotoClick }) {
 
   if (count === 4) {
     return (
-      <div className="grid grid-cols-2 gap-0.5 bg-slate-100" style={{ height: 300, gridTemplateRows: '1fr 1fr' }}>
+      <div className="bg-slate-100" style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        gridTemplateRows: '1fr 1fr',
+        gap: 2,
+        aspectRatio: '4/3',
+      }}>
         {display.map((url, i) => (
           <div key={i} className="overflow-hidden" onClick={() => onPhotoClick(i)}>
             <img src={url} className={imgCls} loading="lazy" alt={`Photo ${i + 1}`} />
@@ -223,10 +232,10 @@ function PhotoGrid({ photos, onPhotoClick }) {
     )
   }
 
-  /* 5+ */
+  /* 5+ — 2 on top, 3 on bottom */
   return (
-    <div className="bg-slate-100 flex flex-col gap-0.5" style={{ height: 360 }}>
-      <div className="grid grid-cols-2 gap-0.5" style={{ flex: '1.3' }}>
+    <div className="bg-slate-100 flex flex-col gap-0.5" style={{ aspectRatio: '4/3' }}>
+      <div className="grid grid-cols-2 gap-0.5" style={{ flex: '1.2' }}>
         {display.slice(0, 2).map((url, i) => (
           <div key={i} className="overflow-hidden" onClick={() => onPhotoClick(i)}>
             <img src={url} className={imgCls} loading="lazy" alt={`Photo ${i + 1}`} />
