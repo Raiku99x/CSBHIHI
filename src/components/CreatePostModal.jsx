@@ -1,71 +1,119 @@
 import { useState, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
-import { X, Image, Paperclip, ChevronDown, Loader2, Megaphone, FileText } from 'lucide-react'
+import {
+  X, Image, Paperclip, ChevronDown, Loader2,
+  Megaphone, FileText, Plus
+} from 'lucide-react'
 import toast from 'react-hot-toast'
+
+const MAX_PHOTOS = 20
+const MAX_FILES  = 10
 
 export default function CreatePostModal({ onClose, onCreated, subjects }) {
   const { user, profile } = useAuth()
   const [form, setForm] = useState({
     caption: '', subject_id: '', post_type: 'status', due_date: ''
   })
-  const [photoFile, setPhotoFile] = useState(null)
-  const [photoPreview, setPhotoPreview] = useState(null)
-  const [attachFile, setAttachFile] = useState(null)
+
+  /* multi-photo state */
+  const [photoFiles,    setPhotoFiles]    = useState([])   // File[]
+  const [photoPreviews, setPhotoPreviews] = useState([])   // object URLs[]
+
+  /* multi-file state */
+  const [attachFiles, setAttachFiles] = useState([])       // File[]
+
   const [loading, setLoading] = useState(false)
   const photoRef = useRef()
-  const fileRef = useRef()
+  const fileRef  = useRef()
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
+  /* ── photo handlers ────────────────────────────────────────── */
   function handlePhoto(e) {
-    const f = e.target.files[0]
-    if (!f) return
-    setPhotoFile(f)
-    setPhotoPreview(URL.createObjectURL(f))
+    const chosen    = Array.from(e.target.files || [])
+    const remaining = MAX_PHOTOS - photoFiles.length
+    if (remaining <= 0) { toast.error(`Max ${MAX_PHOTOS} photos allowed`); return }
+    const toAdd = chosen.slice(0, remaining)
+    if (chosen.length > remaining) toast(`Only added ${remaining} photo${remaining !== 1 ? 's' : ''} (limit reached)`, { icon: '⚠️' })
+    setPhotoFiles(prev  => [...prev, ...toAdd])
+    setPhotoPreviews(prev => [...prev, ...toAdd.map(f => URL.createObjectURL(f))])
+    e.target.value = '' // reset so the same file can be re-selected
   }
 
+  function removePhoto(idx) {
+    URL.revokeObjectURL(photoPreviews[idx])
+    setPhotoFiles(prev    => prev.filter((_, i) => i !== idx))
+    setPhotoPreviews(prev => prev.filter((_, i) => i !== idx))
+  }
+
+  function clearPhotos() {
+    photoPreviews.forEach(u => URL.revokeObjectURL(u))
+    setPhotoFiles([])
+    setPhotoPreviews([])
+  }
+
+  /* ── file handlers ─────────────────────────────────────────── */
   function handleFile(e) {
-    const f = e.target.files[0]
-    if (f) setAttachFile(f)
+    const chosen    = Array.from(e.target.files || [])
+    const remaining = MAX_FILES - attachFiles.length
+    if (remaining <= 0) { toast.error(`Max ${MAX_FILES} files allowed`); return }
+    const toAdd = chosen.slice(0, remaining)
+    if (chosen.length > remaining) toast(`Only added ${remaining} file${remaining !== 1 ? 's' : ''} (limit reached)`, { icon: '⚠️' })
+    setAttachFiles(prev => [...prev, ...toAdd])
+    e.target.value = ''
   }
 
+  function removeFile(idx) {
+    setAttachFiles(prev => prev.filter((_, i) => i !== idx))
+  }
+
+  /* ── upload helper ─────────────────────────────────────────── */
   async function uploadFile(file, bucket) {
-    const ext = file.name.split('.').pop()
-    const path = `${user.id}/${Date.now()}.${ext}`
+    const ext  = file.name.split('.').pop()
+    const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
     const { error } = await supabase.storage.from(bucket).upload(path, file)
     if (error) throw error
     const { data } = supabase.storage.from(bucket).getPublicUrl(path)
     return data.publicUrl
   }
 
+  /* ── submit ────────────────────────────────────────────────── */
   async function handleSubmit(e) {
     e.preventDefault()
-    if (!form.caption.trim() && !photoFile) {
-      toast.error('Add a caption or photo')
+    if (!form.caption.trim() && photoFiles.length === 0) {
+      toast.error('Add a caption or at least one photo')
       return
     }
     setLoading(true)
     try {
-      let photo_url = null
-      let file_url = null
-      let file_name = null
+      /* upload photos in parallel */
+      let photo_url  = null
+      if (photoFiles.length > 0) {
+        const urls = await Promise.all(photoFiles.map(f => uploadFile(f, 'post-media')))
+        photo_url  = JSON.stringify(urls)          // JSON array stored in text column
+      }
 
-      if (photoFile) photo_url = await uploadFile(photoFile, 'post-media')
-      if (attachFile) {
-        file_url = await uploadFile(attachFile, 'post-media')
-        file_name = attachFile.name
+      /* upload attachments in parallel */
+      let file_url  = null
+      let file_name = null
+      if (attachFiles.length > 0) {
+        const results = await Promise.all(
+          attachFiles.map(f => uploadFile(f, 'post-media').then(url => ({ url, name: f.name })))
+        )
+        file_url  = JSON.stringify(results.map(r => r.url))
+        file_name = JSON.stringify(results.map(r => r.name))
       }
 
       const postData = {
-        author_id: user.id,
+        author_id:  user.id,
         subject_id: form.subject_id || null,
-        caption: form.caption.trim(),
+        caption:    form.caption.trim(),
         photo_url,
         file_url,
         file_name,
-        post_type: form.post_type,
-        due_date: form.post_type === 'announcement' && form.due_date ? form.due_date : null,
+        post_type:  form.post_type,
+        due_date:   form.post_type === 'announcement' && form.due_date ? form.due_date : null,
       }
 
       const { data: post, error } = await supabase
@@ -76,7 +124,7 @@ export default function CreatePostModal({ onClose, onCreated, subjects }) {
 
       if (error) throw error
 
-      // If announcement, notify enrolled users
+      /* announce notifications */
       if (form.post_type === 'announcement' && form.subject_id) {
         const { data: enrolled } = await supabase
           .from('user_subjects')
@@ -86,11 +134,11 @@ export default function CreatePostModal({ onClose, onCreated, subjects }) {
 
         if (enrolled?.length) {
           const notifs = enrolled.map(e => ({
-            user_id: e.user_id,
-            post_id: post.id,
-            type: 'announcement',
-            message: `📢 New announcement in ${post.subjects?.name || 'a subject'}: "${form.caption.slice(0, 60)}${form.caption.length > 60 ? '…' : ''}"`,
-            is_read: false,
+            user_id:  e.user_id,
+            post_id:  post.id,
+            type:     'announcement',
+            message:  `📢 New announcement in ${post.subjects?.name || 'a subject'}: "${form.caption.slice(0, 60)}${form.caption.length > 60 ? '…' : ''}"`,
+            is_read:  false,
           }))
           await supabase.from('notifications').insert(notifs)
         }
@@ -106,6 +154,7 @@ export default function CreatePostModal({ onClose, onCreated, subjects }) {
     }
   }
 
+  /* ── render ────────────────────────────────────────────────── */
   return (
     <div className="modal-backdrop" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal-panel">
@@ -157,7 +206,7 @@ export default function CreatePostModal({ onClose, onCreated, subjects }) {
           <textarea
             className="textarea"
             placeholder={form.post_type === 'announcement' ? "What's the announcement?" : "What's on your mind?"}
-            rows={4}
+            rows={3}
             value={form.caption}
             onChange={e => set('caption', e.target.value)}
           />
@@ -191,49 +240,129 @@ export default function CreatePostModal({ onClose, onCreated, subjects }) {
             </div>
           )}
 
-          {/* Photo preview */}
-          {photoPreview && (
-            <div className="relative rounded-xl overflow-hidden">
-              <img src={photoPreview} className="w-full max-h-48 object-cover" alt="preview" />
-              <button
-                type="button"
-                onClick={() => { setPhotoFile(null); setPhotoPreview(null) }}
-                className="absolute top-2 right-2 p-1 bg-black/50 rounded-full text-white hover:bg-black/70"
-              >
-                <X size={14} />
-              </button>
+          {/* ── Photo previews grid ──────────────────────────── */}
+          {photoPreviews.length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs font-medium text-slate-500">
+                  {photoPreviews.length} / {MAX_PHOTOS} photos
+                </p>
+                <button
+                  type="button"
+                  onClick={clearPhotos}
+                  className="text-xs text-rose-500 hover:text-rose-600 font-medium"
+                >
+                  Remove all
+                </button>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2">
+                {photoPreviews.map((url, i) => (
+                  <div key={i} className="relative aspect-square rounded-xl overflow-hidden bg-slate-100">
+                    <img src={url} className="w-full h-full object-cover" alt={`preview ${i + 1}`} />
+                    <button
+                      type="button"
+                      onClick={() => removePhoto(i)}
+                      className="absolute top-1 right-1 p-1 bg-black/60 rounded-full text-white hover:bg-black/80 transition-colors"
+                    >
+                      <X size={11} />
+                    </button>
+                  </div>
+                ))}
+
+                {/* Add more slot */}
+                {photoPreviews.length < MAX_PHOTOS && (
+                  <button
+                    type="button"
+                    onClick={() => photoRef.current.click()}
+                    className="aspect-square rounded-xl border-2 border-dashed border-slate-300 flex flex-col items-center justify-center gap-1 text-slate-400 hover:border-brand-400 hover:text-brand-400 transition-colors"
+                  >
+                    <Plus size={20} />
+                    <span className="text-[10px] font-medium">Add</span>
+                  </button>
+                )}
+              </div>
             </div>
           )}
 
-          {/* File attachment preview */}
-          {attachFile && (
-            <div className="flex items-center gap-2 p-2.5 bg-slate-50 rounded-xl border border-slate-200">
-              <FileText size={16} className="text-brand-600" />
-              <span className="text-sm text-slate-600 flex-1 truncate">{attachFile.name}</span>
-              <button type="button" onClick={() => setAttachFile(null)}>
-                <X size={14} className="text-slate-400" />
-              </button>
+          {/* ── File attachment list ─────────────────────────── */}
+          {attachFiles.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-slate-500">{attachFiles.length} / {MAX_FILES} files</p>
+              {attachFiles.map((file, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-2 p-2.5 bg-slate-50 rounded-xl border border-slate-200"
+                >
+                  <FileText size={15} className="text-brand-600 flex-shrink-0" />
+                  <span className="text-sm text-slate-600 flex-1 truncate">{file.name}</span>
+                  <button type="button" onClick={() => removeFile(i)}>
+                    <X size={14} className="text-slate-400 hover:text-rose-400 transition-colors" />
+                  </button>
+                </div>
+              ))}
             </div>
           )}
 
-          {/* Media buttons */}
+          {/* Hidden inputs */}
+          <input
+            ref={photoRef}
+            type="file"
+            accept="image/*"
+            multiple
+            className="hidden"
+            onChange={handlePhoto}
+          />
+          <input
+            ref={fileRef}
+            type="file"
+            multiple
+            className="hidden"
+            onChange={handleFile}
+          />
+
+          {/* Media buttons + submit */}
           <div className="flex items-center gap-2 pt-1 border-t border-slate-100">
-            <input ref={photoRef} type="file" accept="image/*" className="hidden" onChange={handlePhoto} />
-            <input ref={fileRef} type="file" className="hidden" onChange={handleFile} />
+            {/* Photo button */}
             <button
               type="button"
               onClick={() => photoRef.current.click()}
-              className="btn-ghost text-emerald-600 hover:bg-emerald-50"
+              disabled={photoFiles.length >= MAX_PHOTOS}
+              className={`btn-ghost transition-colors ${
+                photoFiles.length >= MAX_PHOTOS
+                  ? 'opacity-40 cursor-not-allowed'
+                  : 'text-emerald-600 hover:bg-emerald-50'
+              }`}
             >
-              <Image size={16} /> Photo
+              <Image size={16} />
+              Photos
+              {photoFiles.length > 0 && (
+                <span className="ml-0.5 text-xs bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full font-semibold">
+                  {photoFiles.length}
+                </span>
+              )}
             </button>
+
+            {/* File button */}
             <button
               type="button"
               onClick={() => fileRef.current.click()}
-              className="btn-ghost text-brand-600 hover:bg-brand-50"
+              disabled={attachFiles.length >= MAX_FILES}
+              className={`btn-ghost transition-colors ${
+                attachFiles.length >= MAX_FILES
+                  ? 'opacity-40 cursor-not-allowed'
+                  : 'text-brand-600 hover:bg-brand-50'
+              }`}
             >
-              <Paperclip size={16} /> File
+              <Paperclip size={16} />
+              Files
+              {attachFiles.length > 0 && (
+                <span className="ml-0.5 text-xs bg-brand-100 text-brand-700 px-1.5 py-0.5 rounded-full font-semibold">
+                  {attachFiles.length}
+                </span>
+              )}
             </button>
+
             <button
               type="submit"
               disabled={loading}
