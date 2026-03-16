@@ -48,10 +48,6 @@ export default function FeedPage() {
     return () => supabase.removeChannel(channel)
   }, [fetchPosts])
 
-  function handlePostCreated(post) {
-    setPosts(prev => [post, ...prev])
-  }
-
   return (
     <div className="py-4 space-y-4">
       {/* Create post prompt */}
@@ -102,7 +98,7 @@ export default function FeedPage() {
       {showCreate && (
         <CreatePostModal
           onClose={() => setShowCreate(false)}
-          onCreated={handlePostCreated}
+          onCreated={() => {}}
           subjects={subjects}
         />
       )}
