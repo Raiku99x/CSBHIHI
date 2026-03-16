@@ -19,7 +19,7 @@ function parsePhotos(photo_url) {
 function parseFiles(file_url, file_name) {
   if (!file_url) return []
   try {
-    const urls = JSON.parse(file_url)
+    const urls  = JSON.parse(file_url)
     const names = file_name ? JSON.parse(file_name) : []
     if (Array.isArray(urls)) {
       return urls.map((url, i) => ({ url, name: names[i] || 'Attachment' }))
@@ -30,23 +30,11 @@ function parseFiles(file_url, file_name) {
   }
 }
 
-/* ─── Lightbox ──────────────────────────────────────────────── */
+/* ─── Lightbox — vertical scroll, Facebook-style ───────────── */
 function Lightbox({ photos, initialIndex, onClose }) {
-  const [idx, setIdx] = useState(initialIndex)
-  const touchStartX = useRef(null)
-
-  const prev = () => setIdx(i => (i - 1 + photos.length) % photos.length)
-  const next = () => setIdx(i => (i + 1) % photos.length)
-
-  useEffect(() => {
-    const onKey = (e) => {
-      if (e.key === 'ArrowLeft')  prev()
-      if (e.key === 'ArrowRight') next()
-      if (e.key === 'Escape')     onClose()
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [])
+  const [activeIdx, setActiveIdx] = useState(initialIndex)
+  const scrollRef = useRef(null)
+  const itemRefs  = useRef([])
 
   /* lock body scroll */
   useEffect(() => {
@@ -54,78 +42,116 @@ function Lightbox({ photos, initialIndex, onClose }) {
     return () => { document.body.style.overflow = '' }
   }, [])
 
-  function onTouchStart(e) { touchStartX.current = e.touches[0].clientX }
-  function onTouchEnd(e) {
-    if (touchStartX.current === null) return
-    const diff = touchStartX.current - e.changedTouches[0].clientX
-    if (Math.abs(diff) > 50) diff > 0 ? next() : prev()
-    touchStartX.current = null
+  /* jump to clicked photo instantly on open */
+  useEffect(() => {
+    const el = itemRefs.current[initialIndex]
+    if (el) el.scrollIntoView({ block: 'center', behavior: 'instant' })
+  }, [initialIndex])
+
+  /* track which photo is most centred as user scrolls */
+  function handleScroll() {
+    if (!scrollRef.current) return
+    const center = scrollRef.current.scrollTop + scrollRef.current.clientHeight / 2
+    let closest = 0, closestDist = Infinity
+    itemRefs.current.forEach((el, i) => {
+      if (!el) return
+      const dist = Math.abs(el.offsetTop + el.offsetHeight / 2 - center)
+      if (dist < closestDist) { closestDist = dist; closest = i }
+    })
+    setActiveIdx(closest)
   }
 
+  function goTo(idx) {
+    const el = itemRefs.current[idx]
+    if (el) el.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    setActiveIdx(idx)
+  }
+
+  /* keyboard nav */
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape')    onClose()
+      if (e.key === 'ArrowDown') goTo(Math.min(activeIdx + 1, photos.length - 1))
+      if (e.key === 'ArrowUp')   goTo(Math.max(activeIdx - 1, 0))
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [activeIdx, photos.length])
+
   return (
-    <div
-      className="fixed inset-0 z-[200] bg-black/96 flex items-center justify-center"
-      onClick={onClose}
-      onTouchStart={onTouchStart}
-      onTouchEnd={onTouchEnd}
-    >
-      {/* close */}
-      <button
-        onClick={onClose}
-        className="absolute top-4 right-4 z-10 p-2.5 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
-      >
+    <div className="fixed inset-0 z-[200] flex" style={{ background: 'rgba(0,0,0,0.96)' }}>
+
+      {/* Close */}
+      <button onClick={onClose}
+        className="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors">
         <X size={20} />
       </button>
 
-      {/* counter */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/50 text-white text-sm px-3 py-1 rounded-full select-none pointer-events-none">
-        {idx + 1} / {photos.length}
+      {/* Counter */}
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 bg-black/50 text-white text-sm px-3 py-1 rounded-full pointer-events-none select-none">
+        {activeIdx + 1} / {photos.length}
       </div>
 
-      {/* main image */}
+      {/* Up / Down arrows */}
+      {photos.length > 1 && (
+        <>
+          <button onClick={() => goTo(Math.max(activeIdx - 1, 0))}
+            disabled={activeIdx === 0}
+            className="absolute left-1/2 -translate-x-1/2 top-14 z-20 p-2.5 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors disabled:opacity-20">
+            <ChevronLeft size={20} style={{ transform: 'rotate(90deg)' }} />
+          </button>
+          <button onClick={() => goTo(Math.min(activeIdx + 1, photos.length - 1))}
+            disabled={activeIdx === photos.length - 1}
+            className="absolute left-1/2 -translate-x-1/2 bottom-6 z-20 p-2.5 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors disabled:opacity-20">
+            <ChevronLeft size={20} style={{ transform: 'rotate(270deg)' }} />
+          </button>
+        </>
+      )}
+
+      {/* ── Vertically scrollable photo list ── */}
       <div
-        className="relative max-w-4xl w-full h-full flex items-center justify-center p-4 sm:p-12"
-        onClick={e => e.stopPropagation()}
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto flex flex-col items-center gap-4 py-16 px-4"
+        style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.15) transparent' }}
+        onClick={e => { if (e.target === e.currentTarget) onClose() }}
       >
-        <img
-          key={idx}
-          src={photos[idx]}
-          className="max-h-[80vh] max-w-full object-contain rounded-xl select-none animate-fade-in"
-          alt={`Photo ${idx + 1}`}
-          draggable={false}
-        />
-
-        {/* prev / next */}
-        {photos.length > 1 && (
-          <>
-            <button
-              onClick={prev}
-              className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
-            >
-              <ChevronLeft size={22} />
-            </button>
-            <button
-              onClick={next}
-              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
-            >
-              <ChevronRight size={22} />
-            </button>
-          </>
-        )}
+        {photos.map((url, i) => (
+          <div
+            key={i}
+            ref={el => (itemRefs.current[i] = el)}
+            className="w-full max-w-2xl flex-shrink-0 transition-all duration-300"
+            style={{
+              opacity:   i === activeIdx ? 1    : 0.4,
+              transform: i === activeIdx ? 'scale(1)' : 'scale(0.96)',
+            }}
+          >
+            <img
+              src={url}
+              alt={`Photo ${i + 1}`}
+              className="w-full rounded-2xl object-contain select-none"
+              style={{ maxHeight: '80vh' }}
+              draggable={false}
+              loading="lazy"
+            />
+          </div>
+        ))}
+        {/* bottom padding so last photo can centre */}
+        <div style={{ height: '40vh', flexShrink: 0 }} />
       </div>
 
-      {/* thumbnail strip */}
+      {/* ── Thumbnail sidebar (visible on sm+) ── */}
       {photos.length > 1 && (
         <div
-          className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 px-2 max-w-sm overflow-x-auto"
-          onClick={e => e.stopPropagation()}
+          className="hidden sm:flex flex-col gap-2 w-[72px] py-16 pr-2 overflow-y-auto flex-shrink-0"
+          style={{ scrollbarWidth: 'none' }}
         >
           {photos.map((url, i) => (
-            <button
-              key={i}
-              onClick={() => setIdx(i)}
-              className={`flex-shrink-0 w-11 h-11 rounded-lg overflow-hidden border-2 transition-all ${
-                i === idx ? 'border-white scale-110' : 'border-transparent opacity-50 hover:opacity-75'
+            <button key={i} onClick={() => goTo(i)}
+              className={`flex-shrink-0 w-12 h-12 rounded-xl overflow-hidden border-2 transition-all mx-auto block ${
+                i === activeIdx
+                  ? 'border-white opacity-100 scale-105'
+                  : 'border-transparent opacity-35 hover:opacity-65'
               }`}
             >
               <img src={url} className="w-full h-full object-cover" alt="" />
@@ -147,19 +173,14 @@ function PhotoGrid({ photos, onPhotoClick }) {
 
   const imgCls = 'w-full h-full object-cover cursor-pointer hover:brightness-90 transition-[filter] duration-200'
 
-  /* ── 1 photo ── */
   if (count === 1) {
     return (
-      <div
-        className="overflow-hidden bg-slate-100 cursor-pointer"
-        onClick={() => onPhotoClick(0)}
-      >
+      <div className="overflow-hidden bg-slate-100 cursor-pointer" onClick={() => onPhotoClick(0)}>
         <img src={display[0]} alt="post" className="w-full max-h-80 object-cover hover:brightness-90 transition-[filter] duration-200" loading="lazy" />
       </div>
     )
   }
 
-  /* ── 2 photos ── equal columns */
   if (count === 2) {
     return (
       <div className="grid grid-cols-2 gap-0.5 bg-slate-100" style={{ height: 260 }}>
@@ -172,19 +193,12 @@ function PhotoGrid({ photos, onPhotoClick }) {
     )
   }
 
-  /* ── 3 photos ── 1 large left, 2 stacked right */
   if (count === 3) {
     return (
-      <div
-        className="bg-slate-100"
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '2fr 1fr',
-          gridTemplateRows: 'repeat(2, 1fr)',
-          gap: 2,
-          height: 280,
-        }}
-      >
+      <div className="bg-slate-100" style={{
+        display: 'grid', gridTemplateColumns: '2fr 1fr',
+        gridTemplateRows: 'repeat(2, 1fr)', gap: 2, height: 280,
+      }}>
         <div style={{ gridRow: '1 / 3' }} className="overflow-hidden" onClick={() => onPhotoClick(0)}>
           <img src={display[0]} className={imgCls} loading="lazy" alt="Photo 1" />
         </div>
@@ -197,13 +211,9 @@ function PhotoGrid({ photos, onPhotoClick }) {
     )
   }
 
-  /* ── 4 photos ── 2×2 grid */
   if (count === 4) {
     return (
-      <div
-        className="grid grid-cols-2 gap-0.5 bg-slate-100"
-        style={{ height: 300, gridTemplateRows: '1fr 1fr' }}
-      >
+      <div className="grid grid-cols-2 gap-0.5 bg-slate-100" style={{ height: 300, gridTemplateRows: '1fr 1fr' }}>
         {display.map((url, i) => (
           <div key={i} className="overflow-hidden" onClick={() => onPhotoClick(i)}>
             <img src={url} className={imgCls} loading="lazy" alt={`Photo ${i + 1}`} />
@@ -213,10 +223,9 @@ function PhotoGrid({ photos, onPhotoClick }) {
     )
   }
 
-  /* ── 5+ photos ── 2 top row, 3 bottom row; last slot shows +N */
+  /* 5+ */
   return (
     <div className="bg-slate-100 flex flex-col gap-0.5" style={{ height: 360 }}>
-      {/* top 2 */}
       <div className="grid grid-cols-2 gap-0.5" style={{ flex: '1.3' }}>
         {display.slice(0, 2).map((url, i) => (
           <div key={i} className="overflow-hidden" onClick={() => onPhotoClick(i)}>
@@ -224,14 +233,9 @@ function PhotoGrid({ photos, onPhotoClick }) {
           </div>
         ))}
       </div>
-      {/* bottom 3 */}
       <div className="grid grid-cols-3 gap-0.5" style={{ flex: '1' }}>
         {display.slice(2, 5).map((url, i) => (
-          <div
-            key={i}
-            className="overflow-hidden relative"
-            onClick={() => onPhotoClick(i + 2)}
-          >
+          <div key={i} className="overflow-hidden relative" onClick={() => onPhotoClick(i + 2)}>
             <img src={url} className={imgCls} loading="lazy" alt={`Photo ${i + 3}`} />
             {i === 2 && remaining > 0 && (
               <div className="absolute inset-0 bg-black/60 flex items-center justify-center cursor-pointer">
@@ -247,8 +251,8 @@ function PhotoGrid({ photos, onPhotoClick }) {
 
 /* ─── PostCard ───────────────────────────────────────────────── */
 export default function PostCard({ post, currentUserId }) {
-  const [liked, setLiked] = useState(false)
-  const [likeCount, setLikeCount] = useState(0)
+  const [liked, setLiked]               = useState(false)
+  const [likeCount, setLikeCount]       = useState(0)
   const [lightboxIndex, setLightboxIndex] = useState(null)
 
   const isAnnouncement = post.post_type === 'announcement'
@@ -263,7 +267,6 @@ export default function PostCard({ post, currentUserId }) {
   return (
     <>
       <article className={`card animate-fade-in overflow-hidden ${isAnnouncement ? 'ring-1 ring-brand-200' : ''}`}>
-        {/* Announcement banner */}
         {isAnnouncement && (
           <div className="bg-gradient-to-r from-brand-600 to-violet-600 px-4 py-2 flex items-center gap-2">
             <Megaphone size={14} className="text-white/90" />
@@ -276,7 +279,6 @@ export default function PostCard({ post, currentUserId }) {
           </div>
         )}
 
-        {/* Author + caption */}
         <div className="p-4 pb-0">
           <div className="flex items-center gap-3 mb-3">
             <img
@@ -305,25 +307,18 @@ export default function PostCard({ post, currentUserId }) {
           )}
         </div>
 
-        {/* Photo grid — full card width, no side padding */}
         {photos.length > 0 && (
           <div className="mb-3 overflow-hidden">
             <PhotoGrid photos={photos} onPhotoClick={setLightboxIndex} />
           </div>
         )}
 
-        {/* Files + actions */}
         <div className="px-4 pb-4">
           {files.length > 0 && (
             <div className="space-y-2 mb-3">
               {files.map((file, i) => (
-                <a
-                  key={i}
-                  href={file.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 transition-colors"
-                >
+                <a key={i} href={file.url} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 transition-colors">
                   <div className="w-9 h-9 rounded-lg bg-brand-100 flex items-center justify-center flex-shrink-0">
                     <FileText size={16} className="text-brand-600" />
                   </div>
@@ -337,14 +332,11 @@ export default function PostCard({ post, currentUserId }) {
             </div>
           )}
 
-          {/* Actions */}
           <div className="flex items-center gap-1 pt-1 border-t border-slate-100 mt-1">
-            <button
-              onClick={toggleLike}
+            <button onClick={toggleLike}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${
                 liked ? 'text-rose-500 bg-rose-50' : 'text-slate-500 hover:bg-slate-100'
-              }`}
-            >
+              }`}>
               <Heart size={15} fill={liked ? 'currentColor' : 'none'} />
               {likeCount > 0 && <span className="text-xs font-medium">{likeCount}</span>}
             </button>
@@ -358,7 +350,6 @@ export default function PostCard({ post, currentUserId }) {
         </div>
       </article>
 
-      {/* Lightbox */}
       {lightboxIndex !== null && (
         <Lightbox
           photos={photos}
