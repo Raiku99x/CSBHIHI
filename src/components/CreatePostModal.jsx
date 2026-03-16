@@ -23,9 +23,11 @@ export default function CreatePostModal({ onClose, onCreated, subjects }) {
   /* multi-file state */
   const [attachFiles, setAttachFiles] = useState([])       // File[]
 
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading]         = useState(false)
+  const [uploadProgress, setUploadProgress] = useState('')   // e.g. "Uploading photo 3 of 7…"
   const photoRef = useRef()
   const fileRef  = useRef()
+  const uploadCounter = useRef(0)   // guarantees unique paths even within the same ms
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
@@ -68,10 +70,11 @@ export default function CreatePostModal({ onClose, onCreated, subjects }) {
     setAttachFiles(prev => prev.filter((_, i) => i !== idx))
   }
 
-  /* ── upload helper ─────────────────────────────────────────── */
+  /* ── upload helper — guaranteed unique path ────────────────── */
   async function uploadFile(file, bucket) {
-    const ext  = file.name.split('.').pop()
-    const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+    const ext     = file.name.split('.').pop().toLowerCase()
+    const counter = ++uploadCounter.current
+    const path    = `${user.id}/${Date.now()}_${counter}_${Math.random().toString(36).slice(2)}.${ext}`
     const { error } = await supabase.storage.from(bucket).upload(path, file)
     if (error) throw error
     const { data } = supabase.storage.from(bucket).getPublicUrl(path)
@@ -86,24 +89,35 @@ export default function CreatePostModal({ onClose, onCreated, subjects }) {
       return
     }
     setLoading(true)
+    setUploadProgress('')
     try {
-      /* upload photos in parallel */
-      let photo_url  = null
+      /* ── upload photos ONE BY ONE (avoids Supabase storage race conditions) ── */
+      let photo_url = null
       if (photoFiles.length > 0) {
-        const urls = await Promise.all(photoFiles.map(f => uploadFile(f, 'post-media')))
-        photo_url  = JSON.stringify(urls)          // JSON array stored in text column
+        const urls = []
+        for (let i = 0; i < photoFiles.length; i++) {
+          setUploadProgress(`Uploading photo ${i + 1} of ${photoFiles.length}…`)
+          const url = await uploadFile(photoFiles[i], 'post-media')
+          urls.push(url)
+        }
+        photo_url = JSON.stringify(urls)
       }
 
-      /* upload attachments in parallel */
+      /* ── upload attachments ONE BY ONE ── */
       let file_url  = null
       let file_name = null
       if (attachFiles.length > 0) {
-        const results = await Promise.all(
-          attachFiles.map(f => uploadFile(f, 'post-media').then(url => ({ url, name: f.name })))
-        )
+        const results = []
+        for (let i = 0; i < attachFiles.length; i++) {
+          setUploadProgress(`Uploading file ${i + 1} of ${attachFiles.length}…`)
+          const url = await uploadFile(attachFiles[i], 'post-media')
+          results.push({ url, name: attachFiles[i].name })
+        }
         file_url  = JSON.stringify(results.map(r => r.url))
         file_name = JSON.stringify(results.map(r => r.name))
       }
+
+      setUploadProgress('Saving post…')
 
       const postData = {
         author_id:  user.id,
@@ -151,6 +165,7 @@ export default function CreatePostModal({ onClose, onCreated, subjects }) {
       toast.error(err.message || 'Failed to post')
     } finally {
       setLoading(false)
+      setUploadProgress('')
     }
   }
 
@@ -369,7 +384,7 @@ export default function CreatePostModal({ onClose, onCreated, subjects }) {
               className="btn-primary ml-auto"
             >
               {loading && <Loader2 size={15} className="animate-spin" />}
-              {loading ? 'Posting…' : 'Post'}
+              {loading ? (uploadProgress || 'Posting…') : 'Post'}
             </button>
           </div>
         </form>
