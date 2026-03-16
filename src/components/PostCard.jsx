@@ -79,16 +79,16 @@ function Lightbox({ photos, initialIndex, onClose }) {
   }, [activeIdx, photos.length])
 
   return (
-    <div className="fixed inset-0 z-[200] flex" style={{ background: 'rgba(0,0,0,0.96)' }}>
+    <div className="fixed inset-0 z-[200] flex bg-slate-50">
 
       {/* Close */}
       <button onClick={onClose}
-        className="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors">
+        className="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-slate-200 text-slate-700 hover:bg-slate-300 transition-colors">
         <X size={20} />
       </button>
 
       {/* Counter */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 bg-black/50 text-white text-sm px-3 py-1 rounded-full pointer-events-none select-none">
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 bg-white border border-slate-200 text-slate-600 text-sm font-medium px-3 py-1 rounded-full pointer-events-none select-none shadow-sm">
         {activeIdx + 1} / {photos.length}
       </div>
 
@@ -97,12 +97,12 @@ function Lightbox({ photos, initialIndex, onClose }) {
         <>
           <button onClick={() => goTo(Math.max(activeIdx - 1, 0))}
             disabled={activeIdx === 0}
-            className="absolute left-1/2 -translate-x-1/2 top-14 z-20 p-2.5 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors disabled:opacity-20">
+            className="absolute left-1/2 -translate-x-1/2 top-14 z-20 p-2.5 rounded-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 shadow-sm transition-colors disabled:opacity-20">
             <ChevronLeft size={20} style={{ transform: 'rotate(90deg)' }} />
           </button>
           <button onClick={() => goTo(Math.min(activeIdx + 1, photos.length - 1))}
             disabled={activeIdx === photos.length - 1}
-            className="absolute left-1/2 -translate-x-1/2 bottom-6 z-20 p-2.5 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors disabled:opacity-20">
+            className="absolute left-1/2 -translate-x-1/2 bottom-6 z-20 p-2.5 rounded-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 shadow-sm transition-colors disabled:opacity-20">
             <ChevronLeft size={20} style={{ transform: 'rotate(270deg)' }} />
           </button>
         </>
@@ -113,7 +113,7 @@ function Lightbox({ photos, initialIndex, onClose }) {
         ref={scrollRef}
         onScroll={handleScroll}
         className="flex-1 overflow-y-auto flex flex-col items-center gap-4 py-16 px-4"
-        style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.15) transparent' }}
+        style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(0,0,0,0.15) transparent' }}
         onClick={e => { if (e.target === e.currentTarget) onClose() }}
       >
         {photos.map((url, i) => (
@@ -129,7 +129,7 @@ function Lightbox({ photos, initialIndex, onClose }) {
             <img
               src={url}
               alt={`Photo ${i + 1}`}
-              className="w-full rounded-2xl object-contain select-none"
+              className="w-full rounded-2xl object-contain select-none shadow-md border border-slate-100"
               style={{ maxHeight: '80vh' }}
               draggable={false}
               loading="lazy"
@@ -150,8 +150,8 @@ function Lightbox({ photos, initialIndex, onClose }) {
             <button key={i} onClick={() => goTo(i)}
               className={`flex-shrink-0 w-12 h-12 rounded-xl overflow-hidden border-2 transition-all mx-auto block ${
                 i === activeIdx
-                  ? 'border-white opacity-100 scale-105'
-                  : 'border-transparent opacity-35 hover:opacity-65'
+                  ? 'border-brand-500 opacity-100 scale-105'
+                  : 'border-slate-200 opacity-50 hover:opacity-80'
               }`}
             >
               <img src={url} className="w-full h-full object-cover" alt="" />
