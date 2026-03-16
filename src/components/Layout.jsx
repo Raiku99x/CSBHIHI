@@ -127,7 +127,7 @@ export default function Layout({ children }) {
       </header>
 
       {/* Main content */}
-      <main className="flex-1 max-w-2xl mx-auto w-full pb-24 px-4">
+      <main className="flex-1 max-w-2xl mx-auto w-full pb-24 px-2">
         {children}
       </main>
 
