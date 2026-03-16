@@ -58,7 +58,7 @@ export default function PostCard({ post, currentUserId }) {
 
         {/* Photo */}
         {post.photo_url && (
-          <div className="mb-3 -mx-0 rounded-xl overflow-hidden bg-slate-100">
+          <div className="mb-3 -mx-4 overflow-hidden bg-slate-100">
             <img
               src={post.photo_url}
               alt="post"
