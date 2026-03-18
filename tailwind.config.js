@@ -4,22 +4,22 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"DM Sans"', 'system-ui', 'sans-serif'],
-        display: ['"Syne"', 'system-ui', 'sans-serif'],
+        sans: ['"Instrument Sans"', 'system-ui', 'sans-serif'],
+        display: ['"Bricolage Grotesque"', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
       },
       colors: {
         brand: {
-          50:  '#eef2ff',
-          100: '#e0e7ff',
-          200: '#c7d2fe',
-          300: '#a5b4fc',
-          400: '#818cf8',
-          500: '#6366f1',
-          600: '#4f46e5',
-          700: '#4338ca',
-          800: '#3730a3',
-          900: '#312e81',
+          50:  '#E6F4F4',
+          100: '#CCE9E9',
+          200: '#9DD8D8',
+          300: '#7EC8C8',
+          400: '#44ABAF',
+          500: '#0D7377',
+          600: '#0D7377',
+          700: '#0A5C60',
+          800: '#074749',
+          900: '#043132',
         },
       },
       animation: {
@@ -46,4 +46,3 @@ export default {
   },
   plugins: [],
 }
-
