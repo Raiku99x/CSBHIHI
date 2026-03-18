@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import PostCard from '../components/PostCard'
 import { PostSkeleton } from '../components/Skeletons'
-import { Megaphone } from 'lucide-react'
+import { Megaphone, EyeOff, Eye } from 'lucide-react'
 
 const FILTERS = [
   { key: 'all', label: 'All' },
@@ -16,6 +16,7 @@ export default function AnnouncementsPage() {
   const [announcements, setAnnouncements] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
+  const [hideReminders, setHideReminders] = useState(false)
 
   useEffect(() => {
     async function fetch() {
@@ -42,11 +43,20 @@ export default function AnnouncementsPage() {
   }, [user])
 
   const now = new Date()
+
   const filtered = announcements.filter(a => {
+    if (hideReminders) {
+      const isReminder = a.sub_type === 'reminder' || (!a.sub_type && !a.due_date)
+      if (isReminder) return false
+    }
     if (filter === 'upcoming') return !a.due_date || new Date(a.due_date) >= now
     if (filter === 'past') return a.due_date && new Date(a.due_date) < now
     return true
   })
+
+  const reminderCount = announcements.filter(a =>
+    a.sub_type === 'reminder' || (!a.sub_type && !a.due_date)
+  ).length
 
   return (
     <div style={{ paddingTop: 12 }}>
@@ -55,31 +65,54 @@ export default function AnnouncementsPage() {
       <div style={{
         background: 'linear-gradient(135deg, #0D7377 0%, #0A5C60 100%)',
         borderRadius: 12, padding: '20px 20px 18px',
-        marginBottom: 8, display: 'flex', alignItems: 'center', gap: 14,
+        marginBottom: 8,
       }}>
-        <div style={{
-          width: 48, height: 48, borderRadius: 14,
-          background: 'rgba(255,255,255,0.2)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-        }}>
-          <Megaphone size={24} color="white" />
-        </div>
-        <div style={{ flex: 1 }}>
-          <p style={{ margin: 0, fontFamily: '"Bricolage Grotesque", system-ui', fontWeight: 800, fontSize: 20, color: 'white' }}>
-            Announcements
-          </p>
-          <p style={{ margin: '2px 0 0', fontFamily: '"Instrument Sans", system-ui', fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>
-            From your enrolled subjects
-          </p>
-        </div>
-        {!loading && (
-          <span style={{
-            background: 'rgba(255,255,255,0.2)', color: 'white',
-            fontFamily: '"Instrument Sans", system-ui', fontWeight: 700, fontSize: 13,
-            padding: '4px 12px', borderRadius: 20,
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div style={{
+            width: 48, height: 48, borderRadius: 14,
+            background: 'rgba(255,255,255,0.2)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
           }}>
-            {filtered.length}
-          </span>
+            <Megaphone size={24} color="white" />
+          </div>
+          <div style={{ flex: 1 }}>
+            <p style={{ margin: 0, fontFamily: '"Bricolage Grotesque", system-ui', fontWeight: 800, fontSize: 20, color: 'white' }}>
+              Announcements
+            </p>
+            <p style={{ margin: '2px 0 0', fontFamily: '"Instrument Sans", system-ui', fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>
+              From your enrolled subjects
+            </p>
+          </div>
+          {!loading && (
+            <span style={{
+              background: 'rgba(255,255,255,0.2)', color: 'white',
+              fontFamily: '"Instrument Sans", system-ui', fontWeight: 700, fontSize: 13,
+              padding: '4px 12px', borderRadius: 20,
+            }}>
+              {filtered.length}
+            </span>
+          )}
+        </div>
+
+        {/* Hide Reminders toggle */}
+        {!loading && reminderCount > 0 && (
+          <button
+            onClick={() => setHideReminders(h => !h)}
+            style={{
+              marginTop: 12,
+              display: 'inline-flex', alignItems: 'center', gap: 7,
+              padding: '6px 14px', borderRadius: 20, border: 'none', cursor: 'pointer',
+              background: hideReminders ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.15)',
+              color: hideReminders ? '#0D7377' : 'rgba(255,255,255,0.9)',
+              fontFamily: '"Instrument Sans", system-ui', fontWeight: 700, fontSize: 12,
+              transition: 'all 0.15s',
+            }}
+          >
+            {hideReminders
+              ? <><Eye size={14} /> Show Reminders ({reminderCount})</>
+              : <><EyeOff size={14} /> Hide Reminders ({reminderCount})</>
+            }
+          </button>
         )}
       </div>
 
@@ -106,6 +139,30 @@ export default function AnnouncementsPage() {
         ))}
       </div>
 
+      {/* Active hint bar */}
+      {hideReminders && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 8,
+          padding: '8px 14px', borderRadius: 10, marginBottom: 8,
+          background: '#E6F4F4', border: '1px solid #CCE9E9',
+        }}>
+          <EyeOff size={14} color="#0D7377" />
+          <span style={{ fontFamily: '"Instrument Sans", system-ui', fontSize: 13, color: '#0D7377', fontWeight: 600 }}>
+            {reminderCount} reminder{reminderCount !== 1 ? 's' : ''} hidden — showing deadlines only
+          </span>
+          <button
+            onClick={() => setHideReminders(false)}
+            style={{
+              marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer',
+              fontFamily: '"Instrument Sans", system-ui', fontSize: 12, fontWeight: 700,
+              color: '#0D7377', textDecoration: 'underline', padding: 0,
+            }}
+          >
+            Show all
+          </button>
+        </div>
+      )}
+
       {/* ── Content ── */}
       {loading ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -113,11 +170,16 @@ export default function AnnouncementsPage() {
         </div>
       ) : filtered.length === 0 ? (
         <EmptyState
-          emoji="📭"
-          title="No announcements"
-          subtitle={announcements.length === 0
-            ? 'Enroll in subjects to see their announcements'
-            : 'No announcements match this filter'}
+          emoji={hideReminders ? '📅' : '📭'}
+          title={hideReminders ? 'No deadlines' : 'No announcements'}
+          subtitle={
+            hideReminders
+              ? 'No deadlines yet — reminders are hidden'
+              : announcements.length === 0
+                ? 'Enroll in subjects to see their announcements'
+                : 'No announcements match this filter'
+          }
+          action={hideReminders ? { label: 'Show reminders too', onClick: () => setHideReminders(false) } : null}
         />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -128,7 +190,7 @@ export default function AnnouncementsPage() {
   )
 }
 
-function EmptyState({ emoji, title, subtitle }) {
+function EmptyState({ emoji, title, subtitle, action }) {
   return (
     <div style={{
       background: 'white', borderRadius: 12, border: '1px solid #DADDE1',
@@ -141,6 +203,18 @@ function EmptyState({ emoji, title, subtitle }) {
       <p style={{ margin: 0, fontFamily: '"Instrument Sans", system-ui', fontSize: 14, color: '#65676B' }}>
         {subtitle}
       </p>
+      {action && (
+        <button
+          onClick={action.onClick}
+          style={{
+            marginTop: 16, padding: '8px 20px', borderRadius: 8, border: 'none',
+            background: '#0D7377', color: 'white', cursor: 'pointer',
+            fontFamily: '"Instrument Sans", system-ui', fontWeight: 700, fontSize: 13,
+          }}
+        >
+          {action.label}
+        </button>
+      )}
     </div>
   )
 }
