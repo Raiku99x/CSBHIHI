@@ -21,7 +21,7 @@ const MAX_FILES = 10
 export default function CreatePostModal({ onClose, onCreated, subjects, defaultType = 'status' }) {
   const { user, profile } = useAuth()
   const [form, setForm] = useState({
-    caption: '', subject_id: '', post_type: defaultType, due_date: ''
+    caption: '', subject_id: '', post_type: defaultType, sub_type: 'status', due_date: ''
   })
   const [photoFiles, setPhotoFiles] = useState([])
   const [photoPreviews, setPhotoPreviews] = useState([])
@@ -33,6 +33,8 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
   const uploadCounter = useRef(0)
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
+  const isAnnouncement = form.post_type === 'announcement'
+  const isDeadline = isAnnouncement && form.sub_type === 'deadline'
 
   function handlePhoto(e) {
     const chosen = Array.from(e.target.files || [])
@@ -78,6 +80,10 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
       toast.error('Add a caption or photo')
       return
     }
+    if (isDeadline && !form.due_date) {
+      toast.error('Please set a due date for Deadline posts')
+      return
+    }
     setLoading(true)
     try {
       let photo_url = null
@@ -111,7 +117,7 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
           caption: form.caption.trim(),
           photo_url, file_url, file_name,
           post_type: form.post_type,
-          due_date: form.post_type === 'announcement' && form.due_date ? form.due_date : null,
+          due_date: isDeadline && form.due_date ? form.due_date : null,
         })
         .select('*, profiles(*), subjects(*)')
         .single()
@@ -133,7 +139,7 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
         }
       }
 
-      toast.success(form.post_type === 'announcement' ? 'Announcement posted!' : 'Posted!')
+      toast.success(isDeadline ? '📅 Deadline posted!' : isAnnouncement ? '🔔 Reminder posted!' : form.sub_type === 'material' ? '📁 Material shared!' : 'Posted!')
       onCreated(post)
       onClose()
     } catch (err) {
@@ -144,7 +150,6 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
     }
   }
 
-  const isAnnouncement = form.post_type === 'announcement'
 
   return (
     <div
@@ -211,16 +216,16 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
                 }}>
                   <Globe size={11} color="#050505" />
                   <span style={{ fontFamily: '"Instrument Sans", system-ui', fontWeight: 600, fontSize: 12, color: '#050505' }}>
-                    Class
+                    {form.sub_type === 'material' ? 'Material' : form.sub_type === 'deadline' ? 'Deadline' : form.sub_type === 'reminder' ? 'Reminder' : 'Status'} · Class
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Post type toggle */}
+            {/* Post type toggle — Step 1 */}
             <div style={{
               display: 'flex', gap: 6, padding: 4,
-              background: '#F0F2F5', borderRadius: 10, marginBottom: 14,
+              background: '#F0F2F5', borderRadius: 10, marginBottom: 8,
             }}>
               {[
                 { key: 'status', label: 'Status', icon: <FileText size={14} /> },
@@ -229,7 +234,11 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
                 <button
                   key={key}
                   type="button"
-                  onClick={() => set('post_type', key)}
+                  onClick={() => {
+                    set('post_type', key)
+                    set('sub_type', key === 'status' ? 'status' : 'reminder')
+                    if (key === 'status') set('due_date', '')
+                  }}
                   style={{
                     flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                     padding: '7px 0', borderRadius: 8, border: 'none', cursor: 'pointer',
@@ -249,9 +258,60 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
               ))}
             </div>
 
+            {/* Sub-type toggle — Step 2 */}
+            <div style={{
+              display: 'flex', gap: 5, padding: '3px 3px',
+              background: '#F7F8FA', borderRadius: 8,
+              border: '1px solid #E4E6EB',
+              marginBottom: 14,
+            }}>
+              {(isAnnouncement
+                ? [
+                    { key: 'reminder', label: '🔔 Reminder', desc: 'No due date' },
+                    { key: 'deadline', label: '📅 Deadline', desc: 'Requires due date' },
+                  ]
+                : [
+                    { key: 'status', label: '💬 Status', desc: 'General update' },
+                    { key: 'material', label: '📁 Material', desc: 'Learning resource' },
+                  ]
+              ).map(({ key, label, desc }) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => {
+                    set('sub_type', key)
+                    if (key !== 'deadline') set('due_date', '')
+                  }}
+                  style={{
+                    flex: 1, display: 'flex', flexDirection: 'column',
+                    alignItems: 'center', justifyContent: 'center',
+                    padding: '7px 6px', borderRadius: 6, border: 'none', cursor: 'pointer',
+                    fontFamily: '"Instrument Sans", system-ui',
+                    background: form.sub_type === key ? 'white' : 'transparent',
+                    boxShadow: form.sub_type === key ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  <span style={{
+                    fontWeight: 700, fontSize: 12,
+                    color: form.sub_type === key ? '#050505' : '#65676B',
+                  }}>{label}</span>
+                  <span style={{
+                    fontSize: 10, marginTop: 1,
+                    color: form.sub_type === key ? '#65676B' : '#BCC0C4',
+                  }}>{desc}</span>
+                </button>
+              ))}
+            </div>
+
             {/* Textarea */}
             <textarea
-              placeholder={isAnnouncement ? "What's the announcement?" : `What's on your mind, ${profile?.display_name?.split(' ')[0] || 'there'}?`}
+              placeholder={
+                isDeadline ? "Describe this deadline…"
+                  : isAnnouncement ? "What's the reminder about?"
+                  : form.sub_type === 'material' ? "Add a description for this material…"
+                  : `What's on your mind, ${profile?.display_name?.split(' ')[0] || 'there'}?`
+              }
               rows={4}
               value={form.caption}
               onChange={e => set('caption', e.target.value)}
@@ -284,20 +344,26 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
               <ChevronDown size={15} color="#65676B" style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
             </div>
 
-            {/* Due date */}
-            {isAnnouncement && (
+            {/* Due date — only for Deadline sub-type */}
+            {isDeadline && (
               <div style={{ marginTop: 10 }}>
-                <label style={{ fontFamily: '"Instrument Sans", system-ui', fontSize: 12, fontWeight: 600, color: '#65676B', display: 'block', marginBottom: 6 }}>
-                  Due Date (optional)
+                <label style={{
+                  fontFamily: '"Instrument Sans", system-ui', fontSize: 12, fontWeight: 700,
+                  color: '#E41E3F', display: 'flex', alignItems: 'center', gap: 4, marginBottom: 6,
+                }}>
+                  📅 Due Date <span style={{ color: '#E41E3F' }}>*</span>
+                  <span style={{ fontWeight: 400, color: '#65676B', fontSize: 11 }}>(required for Deadline)</span>
                 </label>
                 <input
                   type="date"
                   value={form.due_date}
                   onChange={e => set('due_date', e.target.value)}
                   min={new Date().toISOString().split('T')[0]}
+                  required
                   style={{
                     width: '100%', padding: '10px 14px',
-                    borderRadius: 10, border: '1px solid #E4E6EB',
+                    borderRadius: 10,
+                    border: `1px solid ${form.due_date ? '#0D7377' : '#E41E3F'}`,
                     fontFamily: '"Instrument Sans", system-ui', fontSize: 14, color: '#050505',
                     background: '#F7F8FA', outline: 'none',
                     boxSizing: 'border-box',
