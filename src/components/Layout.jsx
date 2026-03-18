@@ -124,20 +124,23 @@ export default function Layout({ children }) {
           height: 56, padding: '0 12px',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}>
-          {/* Logo */}
+          {/* Logo — CSB image + EduBoard text */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{
-              width: 36, height: 36, borderRadius: 10,
-              background: '#0D7377',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              flexShrink: 0,
+            <img
+              src="/pwa-192x192.png"
+              alt="CSB Logo"
+              style={{
+                width: 36, height: 36,
+                borderRadius: 10,
+                objectFit: 'cover',
+                flexShrink: 0,
+              }}
+            />
+            <span style={{
+              fontFamily: '"Bricolage Grotesque", system-ui',
+              fontWeight: 800, fontSize: 20,
+              color: '#1c1e21', letterSpacing: '-0.3px',
             }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M4 19l4-4m0 0l4-4m-4 4l4 4m4-8l4-4" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M12 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="white" strokeWidth="2.2" strokeLinecap="round"/>
-              </svg>
-            </div>
-            <span style={{ fontFamily: '"Bricolage Grotesque", system-ui', fontWeight: 800, fontSize: 20, color: '#1c1e21', letterSpacing: '-0.3px' }}>
               EduBoard
             </span>
           </div>
