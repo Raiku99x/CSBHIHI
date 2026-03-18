@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useNotifications } from '../hooks/useNotifications'
 import {
   Home, MessageSquare, Bell, BookMarked, Grid3X3,
-  LogOut, Settings, Check, X, ChevronDown, Download
+  LogOut, Settings, Check, ChevronDown, Download
 } from 'lucide-react'
 
 const AVATAR_HEX = ['0D7377','0A5C60','3D5166','4A6070','2D6A4F','3A6EA5','2E5F8A','5C4A7A','6B5B8A','7A5C42','8A6A50','8A4A4B','7A3D3E','647A3A','596B32','1A7A80','156870','3A4F70','2E4260','7A3A35','6A2E2A','156A6E','0F5F63','4A3A7A','3E3068']
@@ -24,20 +24,16 @@ function InstallPrompt() {
       setInstalled(true)
       return
     }
-
     function handleBeforeInstall(e) {
       e.preventDefault()
       setInstallEvent(e)
     }
-
     function handleAppInstalled() {
       setInstalled(true)
       setInstallEvent(null)
     }
-
     window.addEventListener('beforeinstallprompt', handleBeforeInstall)
     window.addEventListener('appinstalled', handleAppInstalled)
-
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstall)
       window.removeEventListener('appinstalled', handleAppInstalled)
@@ -124,7 +120,7 @@ export default function Layout({ children }) {
           height: 56, padding: '0 12px',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}>
-          {/* Logo — CSB image + EduBoard text */}
+          {/* Logo — CSB image + name */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <img
               src="/pwa-192x192.png"
@@ -141,14 +137,12 @@ export default function Layout({ children }) {
               fontWeight: 800, fontSize: 20,
               color: '#1c1e21', letterSpacing: '-0.3px',
             }}>
-              EduBoard
+              CSB Updates
             </span>
           </div>
 
           {/* Right actions */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-
-            {/* Install button */}
             <InstallPrompt />
 
             {/* Notification bell */}
@@ -226,7 +220,6 @@ export default function Layout({ children }) {
                   overflow: 'hidden', zIndex: 100,
                   animation: 'slideDown 0.2s ease',
                 }}>
-                  {/* Profile preview */}
                   <div style={{ padding: '12px 16px', borderBottom: '1px solid #F0F2F5', display: 'flex', alignItems: 'center', gap: 10 }}>
                     <img
                       src={profile?.avatar_url || dicebearUrl(profile?.display_name)}
@@ -242,7 +235,6 @@ export default function Layout({ children }) {
                       </p>
                     </div>
                   </div>
-
                   <MenuAction icon={<Settings size={16} />} label="Profile Settings" onClick={() => { navigate('/profile'); setShowUserMenu(false) }} />
                   <MenuAction icon={<LogOut size={16} />} label="Log Out" onClick={handleSignOut} danger />
                 </div>
@@ -270,12 +262,7 @@ export default function Layout({ children }) {
           paddingBottom: 'env(safe-area-inset-bottom)',
         }}>
           {navItems.map(({ to, icon: Icon, label, exact }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={exact}
-              style={{ flex: 1, textDecoration: 'none' }}
-            >
+            <NavLink key={to} to={to} end={exact} style={{ flex: 1, textDecoration: 'none' }}>
               {({ isActive }) => (
                 <div style={{
                   display: 'flex', flexDirection: 'column',
@@ -285,11 +272,7 @@ export default function Layout({ children }) {
                   marginTop: -1,
                   transition: 'all 0.15s ease',
                 }}>
-                  <Icon
-                    size={22}
-                    color={isActive ? '#0D7377' : '#65676B'}
-                    strokeWidth={isActive ? 2.5 : 2}
-                  />
+                  <Icon size={22} color={isActive ? '#0D7377' : '#65676B'} strokeWidth={isActive ? 2.5 : 2} />
                   <span style={{
                     fontSize: 10, fontWeight: isActive ? 700 : 500,
                     color: isActive ? '#0D7377' : '#65676B',
@@ -365,7 +348,6 @@ function NotifPanel({ notifications, unreadCount, markAllRead, markRead, onClose
           </button>
         )}
       </div>
-
       <div style={{ maxHeight: 320, overflowY: 'auto' }}>
         {notifications.length === 0 ? (
           <div style={{ padding: '32px 16px', textAlign: 'center', color: '#65676B', fontSize: 14, fontFamily: '"Instrument Sans", system-ui' }}>
@@ -382,13 +364,11 @@ function NotifPanel({ notifications, unreadCount, markAllRead, markRead, onClose
 function NotifItem({ notif, onRead, onClose, navigate }) {
   const [hovered, setHovered] = useState(false)
   const icons = { announcement: '📢', tag: '🏷️', whisper: '💬' }
-
   function handleClick() {
     onRead(notif.id)
     onClose()
     if (notif.post_id) navigate(`/?post=${notif.post_id}`)
   }
-
   return (
     <button
       onClick={handleClick}
