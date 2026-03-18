@@ -35,7 +35,7 @@ export default function ProfilePage() {
         style={{
           display: 'flex', alignItems: 'center', gap: 6,
           background: 'none', border: 'none', cursor: 'pointer', padding: '6px 4px',
-          fontFamily: '"DM Sans", system-ui', fontWeight: 600, fontSize: 14, color: '#4f46e5',
+          fontFamily: '"Instrument Sans", system-ui', fontWeight: 600, fontSize: 14, color: '#0D7377',
           marginBottom: 12,
         }}
       >
@@ -50,7 +50,7 @@ export default function ProfilePage() {
         {/* Cover gradient */}
         <div style={{
           height: 100,
-          background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+          background: 'linear-gradient(135deg, #0D7377 0%, #0A5C60 100%)',
         }} />
 
         {/* Avatar section */}
@@ -76,10 +76,10 @@ export default function ProfilePage() {
               </div>
             </div>
             <div style={{ paddingBottom: 4 }}>
-              <p style={{ margin: 0, fontFamily: '"Syne", system-ui', fontWeight: 800, fontSize: 20, color: '#050505' }}>
+              <p style={{ margin: 0, fontFamily: '"Bricolage Grotesque", system-ui', fontWeight: 800, fontSize: 20, color: '#050505' }}>
                 {profile?.display_name}
               </p>
-              <p style={{ margin: '2px 0 0', fontFamily: '"DM Sans", system-ui', fontSize: 13, color: '#65676B' }}>
+              <p style={{ margin: '2px 0 0', fontFamily: '"Instrument Sans", system-ui', fontSize: 13, color: '#65676B' }}>
                 {profile?.email}
               </p>
             </div>
@@ -104,7 +104,7 @@ export default function ProfilePage() {
                 placeholder="Your display name"
                 style={{
                   flex: 1, border: 'none', outline: 'none', background: 'transparent',
-                  fontFamily: '"DM Sans", system-ui', fontSize: 15, color: '#050505',
+                  fontFamily: '"Instrument Sans", system-ui', fontSize: 15, color: '#050505',
                 }}
               />
             </FormField>
@@ -120,7 +120,7 @@ export default function ProfilePage() {
                 disabled
                 style={{
                   flex: 1, border: 'none', outline: 'none', background: 'transparent',
-                  fontFamily: '"DM Sans", system-ui', fontSize: 15, color: '#BCC0C4',
+                  fontFamily: '"Instrument Sans", system-ui', fontSize: 15, color: '#BCC0C4',
                 }}
               />
             </FormField>
@@ -130,9 +130,9 @@ export default function ProfilePage() {
               disabled={saving}
               style={{
                 padding: '13px 0', borderRadius: 10, border: 'none',
-                background: saving ? '#a5b4fc' : '#4f46e5',
+                background: saving ? '#7EC8C8' : '#0D7377',
                 color: 'white', cursor: saving ? 'not-allowed' : 'pointer',
-                fontFamily: '"DM Sans", system-ui', fontWeight: 700, fontSize: 16,
+                fontFamily: '"Instrument Sans", system-ui', fontWeight: 700, fontSize: 16,
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 transition: 'background 0.15s, transform 0.1s',
               }}
@@ -156,7 +156,7 @@ function FormField({ label, icon, children, focused, disabled }) {
     <div>
       <label style={{
         display: 'block', marginBottom: 6,
-        fontFamily: '"DM Sans", system-ui', fontSize: 12, fontWeight: 700,
+        fontFamily: '"Instrument Sans", system-ui', fontSize: 12, fontWeight: 700,
         color: '#65676B', textTransform: 'uppercase', letterSpacing: 0.5,
       }}>
         {label}
@@ -164,9 +164,9 @@ function FormField({ label, icon, children, focused, disabled }) {
       <div style={{
         display: 'flex', alignItems: 'center', gap: 10,
         padding: '0 14px', height: 50, borderRadius: 12,
-        border: `1.5px solid ${focused ? '#4f46e5' : '#E4E6EB'}`,
+        border: `1.5px solid ${focused ? '#0D7377' : '#E4E6EB'}`,
         background: disabled ? '#F7F8FA' : focused ? 'white' : '#F7F8FA',
-        boxShadow: focused ? '0 0 0 3px rgba(79,70,229,0.12)' : 'none',
+        boxShadow: focused ? '0 0 0 3px rgba(13,115,119,0.12)' : 'none',
         transition: 'all 0.15s',
       }}>
         {icon}
