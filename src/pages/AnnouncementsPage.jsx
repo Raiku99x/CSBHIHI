@@ -16,7 +16,7 @@ export default function AnnouncementsPage() {
   const [announcements, setAnnouncements] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
-  const [hideReminders, setHideReminders] = useState(false)
+  const [hideReminders, setHideReminders] = useState(true)
 
   useEffect(() => {
     async function fetch() {
