@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import PostCard from '../components/PostCard'
 import CreatePostModal from '../components/CreatePostModal'
 import { PostSkeleton } from '../components/Skeletons'
-import { PenSquare, Rss } from 'lucide-react'
+import { Image, Megaphone, Video } from 'lucide-react'
 
 export default function FeedPage() {
   const { user, profile } = useAuth()
@@ -12,6 +12,7 @@ export default function FeedPage() {
   const [subjects, setSubjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [showCreate, setShowCreate] = useState(false)
+  const [createType, setCreateType] = useState('status')
 
   const fetchPosts = useCallback(async () => {
     const { data } = await supabase
@@ -29,12 +30,10 @@ export default function FeedPage() {
       if (data) setSubjects(data)
     })
 
-    // Realtime subscription
     const channel = supabase
       .channel('feed-posts')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' },
         async (payload) => {
-          // Fetch full post with joins
           const { data } = await supabase
             .from('posts')
             .select('*, profiles(*), subjects(*)')
@@ -48,51 +47,84 @@ export default function FeedPage() {
     return () => supabase.removeChannel(channel)
   }, [fetchPosts])
 
+  function openCreate(type = 'status') {
+    setCreateType(type)
+    setShowCreate(true)
+  }
+
+  const firstName = profile?.display_name?.split(' ')[0] || 'there'
+
   return (
-    <div className="py-4 space-y-4">
-      {/* Create post prompt */}
-      <div className="card p-4">
-        <div className="flex items-center gap-3">
+    <div style={{ paddingTop: 12, paddingBottom: 8 }}>
+
+      {/* ── Compose card ── */}
+      <div style={{
+        background: 'white', borderRadius: 12,
+        border: '1px solid #DADDE1',
+        boxShadow: '0 1px 2px rgba(0,0,0,0.06)',
+        marginBottom: 8, overflow: 'hidden',
+      }}>
+        {/* Top row: avatar + input */}
+        <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
           <img
             src={profile?.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=U`}
-            className="w-10 h-10 rounded-xl object-cover bg-slate-100 flex-shrink-0"
-            alt="you"
+            alt=""
+            style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, background: '#E4E6EB' }}
           />
           <button
-            onClick={() => setShowCreate(true)}
-            className="flex-1 text-left px-4 py-2.5 rounded-xl bg-slate-100 text-slate-400 text-sm hover:bg-slate-200 transition-colors"
+            onClick={() => openCreate('status')}
+            style={{
+              flex: 1, height: 40,
+              background: '#F0F2F5', border: '1px solid #E4E6EB',
+              borderRadius: 20, padding: '0 16px',
+              textAlign: 'left', cursor: 'pointer',
+              fontSize: 15, color: '#65676B',
+              fontFamily: '"DM Sans", system-ui',
+              transition: 'background 0.12s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = '#E4E6EB'}
+            onMouseLeave={e => e.currentTarget.style.background = '#F0F2F5'}
           >
-            What's on your mind, {profile?.display_name?.split(' ')[0] || 'there'}?
+            What's on your mind, {firstName}?
           </button>
-          <button onClick={() => setShowCreate(true)} className="btn-primary flex-shrink-0">
-            <PenSquare size={15} /> Post
-          </button>
+        </div>
+
+        {/* Divider */}
+        <div style={{ height: 1, background: '#E4E6EB', margin: '0 16px' }} />
+
+        {/* Action buttons row */}
+        <div style={{ display: 'flex', padding: '6px 8px' }}>
+          <ComposeAction
+            icon={<Video size={20} color="#E41E3F" />}
+            label="Live Video"
+            onClick={() => openCreate('status')}
+          />
+          <ComposeAction
+            icon={<Image size={20} color="#45BD62" />}
+            label="Photo/Video"
+            onClick={() => openCreate('status')}
+          />
+          <ComposeAction
+            icon={<Megaphone size={20} color="#4f46e5" />}
+            label="Announce"
+            onClick={() => openCreate('announcement')}
+          />
         </div>
       </div>
 
-      {/* Feed header */}
-      <div className="flex items-center gap-2 px-1">
-        <Rss size={16} className="text-brand-500" />
-        <span className="text-sm font-semibold text-slate-600">All Posts</span>
-        {!loading && <span className="badge-slate ml-auto">{posts.length}</span>}
-      </div>
-
-      {/* Posts */}
+      {/* ── Feed ── */}
       {loading ? (
-        Array.from({ length: 3 }).map((_, i) => <PostSkeleton key={i} />)
-      ) : posts.length === 0 ? (
-        <div className="card p-12 text-center">
-          <div className="text-4xl mb-3">📭</div>
-          <p className="font-semibold text-slate-700">No posts yet</p>
-          <p className="text-sm text-slate-400 mt-1">Be the first to share something!</p>
-          <button onClick={() => setShowCreate(true)} className="btn-primary mt-4">
-            <PenSquare size={15} /> Create Post
-          </button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {Array.from({ length: 3 }).map((_, i) => <PostSkeleton key={i} />)}
         </div>
+      ) : posts.length === 0 ? (
+        <EmptyFeed onPost={() => openCreate('status')} />
       ) : (
-        posts.map(post => (
-          <PostCard key={post.id} post={post} currentUserId={user?.id} />
-        ))
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {posts.map(post => (
+            <PostCard key={post.id} post={post} currentUserId={user?.id} />
+          ))}
+        </div>
       )}
 
       {showCreate && (
@@ -100,8 +132,58 @@ export default function FeedPage() {
           onClose={() => setShowCreate(false)}
           onCreated={() => {}}
           subjects={subjects}
+          defaultType={createType}
         />
       )}
+    </div>
+  )
+}
+
+function ComposeAction({ icon, label, onClick }) {
+  const [hovered, setHovered] = useState(false)
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+        padding: '8px 4px', border: 'none', cursor: 'pointer',
+        background: hovered ? '#F0F2F5' : 'transparent',
+        borderRadius: 8, transition: 'background 0.12s',
+        fontFamily: '"DM Sans", system-ui', fontWeight: 600, fontSize: 13,
+        color: '#65676B',
+      }}
+    >
+      {icon} {label}
+    </button>
+  )
+}
+
+function EmptyFeed({ onPost }) {
+  return (
+    <div style={{
+      background: 'white', borderRadius: 12,
+      border: '1px solid #DADDE1',
+      padding: '48px 24px', textAlign: 'center',
+    }}>
+      <div style={{ fontSize: 48, marginBottom: 12 }}>📭</div>
+      <p style={{ fontFamily: '"Syne", system-ui', fontWeight: 700, fontSize: 18, color: '#050505', margin: '0 0 6px' }}>
+        No posts yet
+      </p>
+      <p style={{ fontFamily: '"DM Sans", system-ui', fontSize: 14, color: '#65676B', margin: '0 0 20px' }}>
+        Be the first to share something with the class.
+      </p>
+      <button
+        onClick={onPost}
+        style={{
+          padding: '10px 24px', borderRadius: 8, border: 'none',
+          background: '#4f46e5', color: 'white', cursor: 'pointer',
+          fontFamily: '"DM Sans", system-ui', fontWeight: 700, fontSize: 14,
+        }}
+      >
+        Create Post
+      </button>
     </div>
   )
 }
