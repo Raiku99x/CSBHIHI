@@ -3,8 +3,8 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useNotifications } from '../hooks/useNotifications'
 import {
-  BookOpen, Home, MessageSquare, Bell, BookMarked, Grid3X3,
-  LogOut, Settings, ChevronDown, Check, X
+  Home, MessageSquare, Bell, BookMarked, Grid3X3,
+  LogOut, Settings, Check, X, ChevronDown
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 
@@ -40,85 +40,135 @@ export default function Layout({ children }) {
   ]
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-100">
-        <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
+    <div style={{ minHeight: '100vh', background: '#F0F2F5', display: 'flex', flexDirection: 'column' }}>
+
+      {/* ── Top Header ── */}
+      <header style={{
+        position: 'sticky', top: 0, zIndex: 40,
+        background: 'white',
+        borderBottom: '1px solid #DADDE1',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.06)',
+      }}>
+        <div style={{
+          maxWidth: 680, margin: '0 auto',
+          height: 56, padding: '0 12px',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}>
           {/* Logo */}
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-brand-600 flex items-center justify-center shadow-sm shadow-brand-600/30">
-              <BookOpen size={16} className="text-white" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{
+              width: 36, height: 36, borderRadius: 10,
+              background: '#4f46e5',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+            }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M4 19l4-4m0 0l4-4m-4 4l4 4m4-8l4-4" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M12 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="white" strokeWidth="2.2" strokeLinecap="round"/>
+              </svg>
             </div>
-            <span className="font-display font-bold text-lg text-slate-800 tracking-tight">EduBoard</span>
+            <span style={{ fontFamily: '"Syne", system-ui', fontWeight: 800, fontSize: 20, color: '#1c1e21', letterSpacing: '-0.3px' }}>
+              EduBoard
+            </span>
           </div>
 
-          <div className="flex items-center gap-1">
+          {/* Right actions */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+
             {/* Notification bell */}
-            <div className="relative" ref={notifRef}>
+            <div ref={notifRef} style={{ position: 'relative' }}>
               <button
                 onClick={() => { setShowNotifs(!showNotifs); setShowUserMenu(false) }}
-                className="relative p-2 rounded-xl hover:bg-slate-100 transition-colors"
+                style={{
+                  width: 40, height: 40, borderRadius: '50%',
+                  background: showNotifs ? '#E7F3FF' : '#F0F2F5',
+                  border: 'none', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  position: 'relative', transition: 'background 0.15s',
+                }}
               >
-                <Bell size={20} className="text-slate-600" />
+                <Bell size={20} color={showNotifs ? '#4f46e5' : '#65676B'} />
                 {unreadCount > 0 && (
-                  <span className="absolute top-1 right-1 w-4 h-4 bg-rose-500 rounded-full text-white text-[10px] font-bold flex items-center justify-center">
+                  <span style={{
+                    position: 'absolute', top: 4, right: 4,
+                    minWidth: 16, height: 16, borderRadius: 8,
+                    background: '#E41E3F', color: 'white',
+                    fontSize: 10, fontWeight: 700, fontFamily: '"DM Sans", system-ui',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    padding: '0 3px', border: '2px solid white',
+                  }}>
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
                 )}
               </button>
 
               {showNotifs && (
-                <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-modal border border-slate-100 overflow-hidden animate-slide-up">
-                  <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
-                    <span className="font-semibold text-sm text-slate-800">Notifications</span>
-                    {unreadCount > 0 && (
-                      <button onClick={markAllRead} className="text-xs text-brand-600 hover:underline font-medium flex items-center gap-1">
-                        <Check size={12} /> Mark all read
-                      </button>
-                    )}
-                  </div>
-                  <div className="max-h-72 overflow-y-auto">
-                    {notifications.length === 0 ? (
-                      <div className="py-10 text-center text-sm text-slate-400">No notifications yet</div>
-                    ) : notifications.map(n => (
-                      <NotifItem key={n.id} notif={n} onRead={markRead} onClose={() => setShowNotifs(false)} navigate={navigate} />
-                    ))}
-                  </div>
-                </div>
+                <NotifPanel
+                  notifications={notifications}
+                  unreadCount={unreadCount}
+                  markAllRead={markAllRead}
+                  markRead={markRead}
+                  onClose={() => setShowNotifs(false)}
+                  navigate={navigate}
+                />
               )}
             </div>
 
-            {/* User menu */}
-            <div className="relative" ref={menuRef}>
+            {/* Avatar + menu */}
+            <div ref={menuRef} style={{ position: 'relative' }}>
               <button
                 onClick={() => { setShowUserMenu(!showUserMenu); setShowNotifs(false) }}
-                className="flex items-center gap-2 pl-1 pr-2 py-1 rounded-xl hover:bg-slate-100 transition-colors"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  padding: '4px 8px 4px 4px',
+                  borderRadius: 20, border: 'none', cursor: 'pointer',
+                  background: showUserMenu ? '#E7F3FF' : 'transparent',
+                  transition: 'background 0.15s',
+                }}
               >
                 <img
                   src={profile?.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=U`}
                   alt="avatar"
-                  className="w-7 h-7 rounded-lg object-cover bg-slate-100"
+                  style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', background: '#E4E6EB' }}
                 />
-                <span className="text-sm font-medium text-slate-700 hidden sm:block max-w-[100px] truncate">
-                  {profile?.display_name || 'User'}
+                <span style={{
+                  fontFamily: '"DM Sans", system-ui', fontWeight: 600, fontSize: 14,
+                  color: '#1c1e21', maxWidth: 96, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  display: 'none',
+                }} className="sm-show">
+                  {profile?.display_name?.split(' ')[0] || 'User'}
                 </span>
-                <ChevronDown size={14} className="text-slate-400" />
+                <ChevronDown size={14} color="#65676B" />
               </button>
 
               {showUserMenu && (
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-2xl shadow-modal border border-slate-100 py-1.5 animate-slide-up">
-                  <div className="px-4 py-2 border-b border-slate-100 mb-1">
-                    <p className="font-semibold text-sm text-slate-800 truncate">{profile?.display_name}</p>
-                    <p className="text-xs text-slate-400 truncate">{profile?.email}</p>
+                <div style={{
+                  position: 'absolute', right: 0, top: 'calc(100% + 8px)',
+                  width: 220, background: 'white',
+                  borderRadius: 12, border: '1px solid #DADDE1',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                  overflow: 'hidden', zIndex: 100,
+                  animation: 'slideDown 0.2s ease',
+                }}>
+                  {/* Profile preview */}
+                  <div style={{ padding: '12px 16px', borderBottom: '1px solid #F0F2F5', display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <img
+                      src={profile?.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=U`}
+                      style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover' }}
+                      alt=""
+                    />
+                    <div style={{ minWidth: 0 }}>
+                      <p style={{ margin: 0, fontWeight: 700, fontSize: 14, color: '#1c1e21', fontFamily: '"DM Sans", system-ui', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {profile?.display_name}
+                      </p>
+                      <p style={{ margin: 0, fontSize: 12, color: '#65676B', fontFamily: '"DM Sans", system-ui', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {profile?.email}
+                      </p>
+                    </div>
                   </div>
-                  <button onClick={() => { navigate('/profile'); setShowUserMenu(false) }}
-                    className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                    <Settings size={15} /> Profile Settings
-                  </button>
-                  <button onClick={handleSignOut}
-                    className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 transition-colors">
-                    <LogOut size={15} /> Sign Out
-                  </button>
+
+                  <MenuAction icon={<Settings size={16} />} label="Profile Settings" onClick={() => { navigate('/profile'); setShowUserMenu(false) }} />
+                  <MenuAction icon={<LogOut size={16} />} label="Log Out" onClick={handleSignOut} danger />
                 </div>
               )}
             </div>
@@ -126,62 +176,167 @@ export default function Layout({ children }) {
         </div>
       </header>
 
-      {/* Main content */}
-      <main className="flex-1 max-w-2xl mx-auto w-full pb-24 px-2">
+      {/* ── Main ── */}
+      <main style={{ flex: 1, maxWidth: 680, margin: '0 auto', width: '100%', paddingBottom: 80 }}>
         {children}
       </main>
 
-      {/* Footer nav */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-100"
-        style={{ boxShadow: '0 -1px 0 rgba(0,0,0,0.06), 0 -8px 24px rgba(0,0,0,0.04)' }}>
-        <div className="max-w-2xl mx-auto px-2 h-16 flex items-center">
+      {/* ── Bottom Nav ── */}
+      <nav style={{
+        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 40,
+        background: 'white',
+        borderTop: '1px solid #DADDE1',
+        boxShadow: '0 -2px 8px rgba(0,0,0,0.06)',
+      }}>
+        <div style={{
+          maxWidth: 680, margin: '0 auto',
+          height: 56, display: 'flex', alignItems: 'center',
+          paddingBottom: 'env(safe-area-inset-bottom)',
+        }}>
           {navItems.map(({ to, icon: Icon, label, exact }) => (
             <NavLink
               key={to}
               to={to}
               end={exact}
-              className={({ isActive }) =>
-                `flex-1 flex flex-col items-center justify-center gap-0.5 py-2 rounded-xl transition-all duration-200 ${
-                  isActive
-                    ? 'text-brand-600'
-                    : 'text-slate-400 hover:text-slate-600'
-                }`
-              }
+              style={{ flex: 1, textDecoration: 'none' }}
             >
               {({ isActive }) => (
-                <>
-                  <div className={`p-1 rounded-lg transition-all ${isActive ? 'bg-brand-50' : ''}`}>
-                    <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
-                  </div>
-                  <span className={`text-[10px] font-medium ${isActive ? 'font-semibold' : ''}`}>{label}</span>
-                </>
+                <div style={{
+                  display: 'flex', flexDirection: 'column',
+                  alignItems: 'center', justifyContent: 'center',
+                  gap: 3, padding: '6px 0',
+                  borderTop: isActive ? '2px solid #4f46e5' : '2px solid transparent',
+                  marginTop: -1,
+                  transition: 'all 0.15s ease',
+                }}>
+                  <Icon
+                    size={22}
+                    color={isActive ? '#4f46e5' : '#65676B'}
+                    strokeWidth={isActive ? 2.5 : 2}
+                  />
+                  <span style={{
+                    fontSize: 10, fontWeight: isActive ? 700 : 500,
+                    color: isActive ? '#4f46e5' : '#65676B',
+                    fontFamily: '"DM Sans", system-ui',
+                    letterSpacing: 0.1,
+                  }}>
+                    {label}
+                  </span>
+                </div>
               )}
             </NavLink>
           ))}
         </div>
       </nav>
+
+      <style>{`
+        @media (min-width: 480px) { .sm-show { display: block !important; } }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+      `}</style>
+    </div>
+  )
+}
+
+function MenuAction({ icon, label, onClick, danger }) {
+  const [hovered, setHovered] = useState(false)
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+        padding: '10px 16px', border: 'none', cursor: 'pointer', textAlign: 'left',
+        background: hovered ? (danger ? '#FFF5F5' : '#F7F8FA') : 'transparent',
+        color: danger ? '#E41E3F' : '#1c1e21',
+        fontFamily: '"DM Sans", system-ui', fontWeight: 500, fontSize: 14,
+        transition: 'background 0.12s',
+      }}
+    >
+      {icon} {label}
+    </button>
+  )
+}
+
+function NotifPanel({ notifications, unreadCount, markAllRead, markRead, onClose, navigate }) {
+  return (
+    <div style={{
+      position: 'absolute', right: 0, top: 'calc(100% + 8px)',
+      width: 320, background: 'white',
+      borderRadius: 12, border: '1px solid #DADDE1',
+      boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+      overflow: 'hidden', zIndex: 100,
+      animation: 'slideDown 0.2s ease',
+    }}>
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '12px 16px', borderBottom: '1px solid #F0F2F5',
+      }}>
+        <span style={{ fontFamily: '"Syne", system-ui', fontWeight: 700, fontSize: 16, color: '#1c1e21' }}>
+          Notifications
+        </span>
+        {unreadCount > 0 && (
+          <button
+            onClick={markAllRead}
+            style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              color: '#4f46e5', fontSize: 12, fontWeight: 600,
+              fontFamily: '"DM Sans", system-ui',
+              display: 'flex', alignItems: 'center', gap: 4,
+            }}
+          >
+            <Check size={12} /> Mark all read
+          </button>
+        )}
+      </div>
+
+      <div style={{ maxHeight: 320, overflowY: 'auto' }}>
+        {notifications.length === 0 ? (
+          <div style={{ padding: '32px 16px', textAlign: 'center', color: '#65676B', fontSize: 14, fontFamily: '"DM Sans", system-ui' }}>
+            No notifications yet
+          </div>
+        ) : notifications.map(n => (
+          <NotifItem key={n.id} notif={n} onRead={markRead} onClose={onClose} navigate={navigate} />
+        ))}
+      </div>
     </div>
   )
 }
 
 function NotifItem({ notif, onRead, onClose, navigate }) {
+  const [hovered, setHovered] = useState(false)
   const icons = { announcement: '📢', tag: '🏷️', whisper: '💬' }
+
   function handleClick() {
     onRead(notif.id)
     onClose()
     if (notif.post_id) navigate(`/?post=${notif.post_id}`)
   }
+
   return (
-    <button onClick={handleClick}
-      className={`w-full flex items-start gap-3 px-4 py-3 hover:bg-slate-50 transition-colors text-left ${!notif.is_read ? 'bg-brand-50/40' : ''}`}>
-      <span className="text-lg mt-0.5">{icons[notif.type] || '🔔'}</span>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm text-slate-700 leading-snug">{notif.message}</p>
-        <p className="text-xs text-slate-400 mt-0.5">
+    <button
+      onClick={handleClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        width: '100%', display: 'flex', alignItems: 'flex-start', gap: 12,
+        padding: '10px 16px', border: 'none', cursor: 'pointer', textAlign: 'left',
+        background: hovered ? '#F7F8FA' : notif.is_read ? 'white' : '#EEF2FF',
+        transition: 'background 0.12s',
+      }}
+    >
+      <span style={{ fontSize: 22, flexShrink: 0, marginTop: 2 }}>{icons[notif.type] || '🔔'}</span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ margin: 0, fontSize: 13, color: '#1c1e21', fontFamily: '"DM Sans", system-ui', lineHeight: 1.4 }}>
+          {notif.message}
+        </p>
+        <p style={{ margin: '3px 0 0', fontSize: 11, color: '#65676B', fontFamily: '"DM Sans", system-ui' }}>
           {formatDistanceToNow(new Date(notif.created_at), { addSuffix: true })}
         </p>
       </div>
-      {!notif.is_read && <div className="w-2 h-2 rounded-full bg-brand-500 mt-1.5 flex-shrink-0" />}
+      {!notif.is_read && (
+        <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#4f46e5', flexShrink: 0, marginTop: 6 }} />
+      )}
     </button>
   )
 }
