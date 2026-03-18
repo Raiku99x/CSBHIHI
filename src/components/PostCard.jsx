@@ -253,17 +253,17 @@ export default function PostCard({ post, currentUserId }) {
           }}>
             <Megaphone size={14} color="white" style={{ opacity: 0.9 }} />
             <span style={{ color: 'white', fontSize: 12, fontWeight: 700, fontFamily: '"Instrument Sans", system-ui', letterSpacing: 0.5, textTransform: 'uppercase' }}>
-              Announcement
+              {post.sub_type === 'deadline' ? 'Deadline' : post.sub_type === 'reminder' ? 'Reminder' : 'Announcement'}
+              {post.announcement_type ? ` · ${post.announcement_type}` : ''}
             </span>
-            {post.due_date && (
-              <span style={{
-                marginLeft: 'auto', color: 'rgba(255,255,255,0.85)',
-                fontSize: 12, fontFamily: '"Instrument Sans", system-ui',
-                display: 'flex', alignItems: 'center', gap: 4,
-              }}>
-                <Calendar size={11} /> Due {format(new Date(post.due_date), 'MMM d, yyyy')}
-              </span>
-            )}
+            <span style={{ marginLeft: 'auto', color: 'rgba(255,255,255,0.85)', fontSize: 12, fontFamily: '"Instrument Sans", system-ui', display: 'flex', alignItems: 'center', gap: 4 }}>
+              {post.due_date
+                ? <><Calendar size={11} /> Due {format(new Date(post.due_date), 'MMM d, yyyy')}</>
+                : post.sub_type === 'reminder'
+                  ? <>🔔 Reminder</>
+                  : null
+              }
+            </span>
           </div>
         )}
 
