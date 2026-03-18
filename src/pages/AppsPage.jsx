@@ -47,17 +47,17 @@ export default function AppsPage() {
           <Grid3X3 size={22} color="white" />
         </div>
         <div style={{ flex: 1 }}>
-          <p style={{ margin: 0, fontFamily: '"Syne", system-ui', fontWeight: 800, fontSize: 20, color: '#050505' }}>
+          <p style={{ margin: 0, fontFamily: '"Bricolage Grotesque", system-ui', fontWeight: 800, fontSize: 20, color: '#050505' }}>
             Apps
           </p>
-          <p style={{ margin: '2px 0 0', fontFamily: '"DM Sans", system-ui', fontSize: 13, color: '#65676B' }}>
+          <p style={{ margin: '2px 0 0', fontFamily: '"Instrument Sans", system-ui', fontSize: 13, color: '#65676B' }}>
             Tools linked to your subjects
           </p>
         </div>
         {!loading && totalApps > 0 && (
           <span style={{
             background: '#F0F2F5', color: '#050505',
-            fontFamily: '"DM Sans", system-ui', fontWeight: 700, fontSize: 13,
+            fontFamily: '"Instrument Sans", system-ui', fontWeight: 700, fontSize: 13,
             padding: '4px 12px', borderRadius: 20,
           }}>
             {totalApps} apps
@@ -81,14 +81,14 @@ export default function AppsPage() {
                 padding: '12px 16px', borderBottom: '1px solid #F0F2F5',
                 background: '#FAFAFA',
               }}>
-                <p style={{ margin: 0, fontFamily: '"DM Sans", system-ui', fontWeight: 700, fontSize: 14, color: '#050505' }}>
+                <p style={{ margin: 0, fontFamily: '"Instrument Sans", system-ui', fontWeight: 700, fontSize: 14, color: '#050505' }}>
                   {subject.name}
                 </p>
               </div>
 
               {apps.length === 0 ? (
                 <p style={{
-                  margin: 0, padding: '16px', fontFamily: '"DM Sans", system-ui',
+                  margin: 0, padding: '16px', fontFamily: '"Instrument Sans", system-ui',
                   fontSize: 13, color: '#BCC0C4', fontStyle: 'italic',
                 }}>
                   No apps linked yet
@@ -120,8 +120,8 @@ function AppCard({ app }) {
       style={{
         display: 'flex', alignItems: 'center', gap: 10,
         padding: '10px 12px', borderRadius: 10, textDecoration: 'none',
-        border: `1.5px solid ${hovered ? '#a5b4fc' : '#E4E6EB'}`,
-        background: hovered ? '#EEF2FF' : '#F7F8FA',
+        border: `1.5px solid ${hovered ? '#7EC8C8' : '#E4E6EB'}`,
+        background: hovered ? '#E6F4F4' : '#F7F8FA',
         transition: 'all 0.15s',
       }}
     >
@@ -130,20 +130,20 @@ function AppCard({ app }) {
       ) : (
         <div style={{
           width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-          background: '#EEF2FF', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: '#E6F4F4', display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-          <AppWindow size={18} color="#4f46e5" />
+          <AppWindow size={18} color="#0D7377" />
         </div>
       )}
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{
-          margin: 0, fontFamily: '"DM Sans", system-ui', fontWeight: 700, fontSize: 13,
+          margin: 0, fontFamily: '"Instrument Sans", system-ui', fontWeight: 700, fontSize: 13,
           color: '#050505', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}>
           {app.name}
         </p>
       </div>
-      <ExternalLink size={13} color={hovered ? '#4f46e5' : '#BCC0C4'} style={{ flexShrink: 0, transition: 'color 0.15s' }} />
+      <ExternalLink size={13} color={hovered ? '#0D7377' : '#BCC0C4'} style={{ flexShrink: 0, transition: 'color 0.15s' }} />
     </a>
   )
 }
@@ -186,10 +186,10 @@ function EmptyState() {
       padding: '48px 24px', textAlign: 'center',
     }}>
       <div style={{ fontSize: 44, marginBottom: 10 }}>🧩</div>
-      <p style={{ margin: '0 0 6px', fontFamily: '"Syne", system-ui', fontWeight: 700, fontSize: 17, color: '#050505' }}>
+      <p style={{ margin: '0 0 6px', fontFamily: '"Bricolage Grotesque", system-ui', fontWeight: 700, fontSize: 17, color: '#050505' }}>
         No apps available
       </p>
-      <p style={{ margin: 0, fontFamily: '"DM Sans", system-ui', fontSize: 14, color: '#65676B' }}>
+      <p style={{ margin: 0, fontFamily: '"Instrument Sans", system-ui', fontSize: 14, color: '#65676B' }}>
         Enroll in subjects to see their linked apps
       </p>
     </div>
