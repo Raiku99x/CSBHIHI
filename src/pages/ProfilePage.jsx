@@ -4,6 +4,15 @@ import { Loader2, ArrowLeft, Camera, Mail, User } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 
+const AVATAR_HEX = ['0D7377','0A5C60','3D5166','4A6070','2D6A4F','3A6EA5','2E5F8A','5C4A7A','6B5B8A','7A5C42','8A6A50','8A4A4B','7A3D3E','647A3A','596B32','1A7A80','156870','3A4F70','2E4260','7A3A35','6A2E2A','156A6E','0F5F63','4A3A7A','3E3068']
+function avatarHex(name = '') {
+  const c = (name.trim()[0] || 'A').toUpperCase()
+  return AVATAR_HEX[Math.max(0, c.charCodeAt(0) - 65) % AVATAR_HEX.length]
+}
+function dicebearUrl(name = '') {
+  return `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name || 'U')}&backgroundColor=${avatarHex(name)}&textColor=ffffff`
+}
+
 export default function ProfilePage() {
   const { profile, updateProfile } = useAuth()
   const navigate = useNavigate()
@@ -16,7 +25,7 @@ export default function ProfilePage() {
     if (!displayName.trim()) { toast.error('Name cannot be empty'); return }
     setSaving(true)
     try {
-      const newAvatar = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(displayName)}&backgroundColor=4f46e5&textColor=ffffff`
+      const newAvatar = dicebearUrl(displayName.trim())
       await updateProfile({ display_name: displayName.trim(), avatar_url: newAvatar })
       toast.success('Profile updated!')
     } catch (err) {
@@ -58,7 +67,7 @@ export default function ProfilePage() {
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, marginBottom: 16 }}>
             <div style={{ position: 'relative', marginTop: -44 }}>
               <img
-                src={profile?.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=U`}
+                src={profile?.avatar_url || dicebearUrl(profile?.display_name)}
                 style={{
                   width: 88, height: 88, borderRadius: '50%',
                   objectFit: 'cover', border: '4px solid white',
