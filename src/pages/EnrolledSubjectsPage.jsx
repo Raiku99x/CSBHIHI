@@ -10,7 +10,7 @@ import {
 import toast from 'react-hot-toast'
 
 const SUBJECT_COLORS = [
-  { bg: '#EEF2FF', icon: '#4f46e5', bar: 'linear-gradient(135deg,#4f46e5,#7c3aed)' },
+  { bg: '#E6F4F4', icon: '#0D7377', bar: 'linear-gradient(135deg,#0D7377,#0A5C60)' },
   { bg: '#FDF4FF', icon: '#9333ea', bar: 'linear-gradient(135deg,#9333ea,#c026d3)' },
   { bg: '#F0FDF4', icon: '#16a34a', bar: 'linear-gradient(135deg,#16a34a,#15803d)' },
   { bg: '#FFFBEB', icon: '#d97706', bar: 'linear-gradient(135deg,#d97706,#b45309)' },
@@ -96,16 +96,16 @@ export default function EnrolledSubjectsPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
           <div style={{
             width: 48, height: 48, borderRadius: 14,
-            background: '#EEF2FF',
+            background: '#E6F4F4',
             display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
           }}>
-            <BookMarked size={22} color="#4f46e5" />
+            <BookMarked size={22} color="#0D7377" />
           </div>
           <div>
-            <p style={{ margin: 0, fontFamily: '"Syne", system-ui', fontWeight: 800, fontSize: 20, color: '#050505' }}>
+            <p style={{ margin: 0, fontFamily: '"Bricolage Grotesque", system-ui', fontWeight: 800, fontSize: 20, color: '#050505' }}>
               Subjects
             </p>
-            <p style={{ margin: '2px 0 0', fontFamily: '"DM Sans", system-ui', fontSize: 13, color: '#65676B' }}>
+            <p style={{ margin: '2px 0 0', fontFamily: '"Instrument Sans", system-ui', fontSize: 13, color: '#65676B' }}>
               {enrolledIds.size} enrolled · {allSubjects.length} total
             </p>
           </div>
@@ -125,7 +125,7 @@ export default function EnrolledSubjectsPage() {
             onChange={e => setSearch(e.target.value)}
             style={{
               flex: 1, border: 'none', background: 'transparent', outline: 'none',
-              fontFamily: '"DM Sans", system-ui', fontSize: 14, color: '#050505',
+              fontFamily: '"Instrument Sans", system-ui', fontSize: 14, color: '#050505',
             }}
           />
           {search && (
@@ -183,12 +183,12 @@ function Section({ title, count, children }) {
   return (
     <div style={{ marginBottom: 8 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 4px', marginBottom: 6 }}>
-        <span style={{ fontFamily: '"DM Sans", system-ui', fontWeight: 700, fontSize: 12, color: '#65676B', textTransform: 'uppercase', letterSpacing: 0.6 }}>
+        <span style={{ fontFamily: '"Instrument Sans", system-ui', fontWeight: 700, fontSize: 12, color: '#65676B', textTransform: 'uppercase', letterSpacing: 0.6 }}>
           {title}
         </span>
         <span style={{
           background: '#E4E6EB', color: '#65676B',
-          fontFamily: '"DM Sans", system-ui', fontWeight: 700, fontSize: 11,
+          fontFamily: '"Instrument Sans", system-ui', fontWeight: 700, fontSize: 11,
           padding: '1px 7px', borderRadius: 10,
         }}>
           {count}
@@ -210,7 +210,7 @@ function SubjectRow({ subject, enrolled, toggling, onToggle, onClick }) {
     <div
       style={{
         background: 'white', borderRadius: 12,
-        border: `1.5px solid ${enrolled ? '#a5b4fc' : '#DADDE1'}`,
+        border: `1.5px solid ${enrolled ? '#7EC8C8' : '#DADDE1'}`,
         padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 12,
         boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
         transition: 'border-color 0.15s, box-shadow 0.15s',
@@ -234,13 +234,13 @@ function SubjectRow({ subject, enrolled, toggling, onToggle, onClick }) {
       {/* Info */}
       <div style={{ flex: 1, minWidth: 0, cursor: 'pointer' }} onClick={onClick}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-          <span style={{ fontFamily: '"DM Sans", system-ui', fontWeight: 700, fontSize: 14, color: '#050505' }}>
+          <span style={{ fontFamily: '"Instrument Sans", system-ui', fontWeight: 700, fontSize: 14, color: '#050505' }}>
             {subject.name}
           </span>
           {enrolled && (
             <span style={{
               background: '#F0FDF4', color: '#16a34a',
-              fontFamily: '"DM Sans", system-ui', fontWeight: 700, fontSize: 10,
+              fontFamily: '"Instrument Sans", system-ui', fontWeight: 700, fontSize: 10,
               padding: '2px 7px', borderRadius: 10, letterSpacing: 0.3,
             }}>
               ✓ Enrolled
@@ -249,7 +249,7 @@ function SubjectRow({ subject, enrolled, toggling, onToggle, onClick }) {
         </div>
         {subject.description && (
           <p style={{
-            margin: '2px 0 0', fontFamily: '"DM Sans", system-ui', fontSize: 12,
+            margin: '2px 0 0', fontFamily: '"Instrument Sans", system-ui', fontSize: 12,
             color: '#65676B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           }}>
             {subject.description}
@@ -266,11 +266,11 @@ function SubjectRow({ subject, enrolled, toggling, onToggle, onClick }) {
         style={{
           display: 'flex', alignItems: 'center', gap: 5,
           padding: '7px 14px', borderRadius: 8, border: 'none', cursor: toggling ? 'not-allowed' : 'pointer',
-          fontFamily: '"DM Sans", system-ui', fontWeight: 700, fontSize: 13,
+          fontFamily: '"Instrument Sans", system-ui', fontWeight: 700, fontSize: 13,
           background: enrolled
             ? btnHovered ? '#FEE2E2' : '#FFF1F2'
-            : btnHovered ? '#e0e7ff' : '#EEF2FF',
-          color: enrolled ? '#e11d48' : '#4f46e5',
+            : btnHovered ? '#CCE9E9' : '#E6F4F4',
+          color: enrolled ? '#e11d48' : '#0D7377',
           flexShrink: 0, transition: 'background 0.12s',
         }}
       >
@@ -325,7 +325,7 @@ function SubjectDetail({ subject, isEnrolled, userId, onBack, onToggle }) {
         style={{
           display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10,
           background: 'none', border: 'none', cursor: 'pointer', padding: '4px 4px',
-          fontFamily: '"DM Sans", system-ui', fontWeight: 600, fontSize: 14, color: '#4f46e5',
+          fontFamily: '"Instrument Sans", system-ui', fontWeight: 600, fontSize: 14, color: '#0D7377',
         }}
       >
         <ChevronLeft size={17} /> All Subjects
@@ -350,11 +350,11 @@ function SubjectDetail({ subject, isEnrolled, userId, onBack, onToggle }) {
               <BookOpen size={24} color={color.icon} />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: 0, fontFamily: '"Syne", system-ui', fontWeight: 800, fontSize: 18, color: '#050505' }}>
+              <p style={{ margin: 0, fontFamily: '"Bricolage Grotesque", system-ui', fontWeight: 800, fontSize: 18, color: '#050505' }}>
                 {subject.name}
               </p>
               {subject.description && (
-                <p style={{ margin: '4px 0 0', fontFamily: '"DM Sans", system-ui', fontSize: 13, color: '#65676B', lineHeight: 1.4 }}>
+                <p style={{ margin: '4px 0 0', fontFamily: '"Instrument Sans", system-ui', fontSize: 13, color: '#65676B', lineHeight: 1.4 }}>
                   {subject.description}
                 </p>
               )}
@@ -372,9 +372,9 @@ function SubjectDetail({ subject, isEnrolled, userId, onBack, onToggle }) {
               style={{
                 flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
                 padding: '12px 8px', border: 'none', cursor: 'pointer', background: 'transparent',
-                fontFamily: '"DM Sans", system-ui', fontWeight: 600, fontSize: 13,
-                color: activeTab === key ? '#4f46e5' : '#65676B',
-                borderBottom: `2px solid ${activeTab === key ? '#4f46e5' : 'transparent'}`,
+                fontFamily: '"Instrument Sans", system-ui', fontWeight: 600, fontSize: 13,
+                color: activeTab === key ? '#0D7377' : '#65676B',
+                borderBottom: `2px solid ${activeTab === key ? '#0D7377' : 'transparent'}`,
                 whiteSpace: 'nowrap', transition: 'color 0.15s, border-color 0.15s',
               }}
             >
@@ -416,11 +416,11 @@ function ToggleBtn({ enrolled, onToggle }) {
       style={{
         display: 'flex', alignItems: 'center', gap: 5,
         padding: '8px 16px', borderRadius: 8, border: 'none', cursor: 'pointer',
-        fontFamily: '"DM Sans", system-ui', fontWeight: 700, fontSize: 13,
+        fontFamily: '"Instrument Sans", system-ui', fontWeight: 700, fontSize: 13,
         background: enrolled
           ? hovered ? '#FEE2E2' : '#FFF1F2'
-          : hovered ? '#e0e7ff' : '#EEF2FF',
-        color: enrolled ? '#e11d48' : '#4f46e5',
+          : hovered ? '#CCE9E9' : '#E6F4F4',
+        color: enrolled ? '#e11d48' : '#0D7377',
         flexShrink: 0, transition: 'background 0.12s',
       }}
     >
@@ -486,10 +486,10 @@ function TabContent({ activeTab, posts, filePosts, mediaPosts, apps, userId, col
                   </div>
               }
               <div style={{ minWidth: 0, flex: 1 }}>
-                <p style={{ margin: 0, fontFamily: '"DM Sans", system-ui', fontWeight: 700, fontSize: 13, color: '#050505', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <p style={{ margin: 0, fontFamily: '"Instrument Sans", system-ui', fontWeight: 700, fontSize: 13, color: '#050505', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {app.name}
                 </p>
-                <p style={{ margin: '1px 0 0', fontFamily: '"DM Sans", system-ui', fontSize: 11, color: '#65676B' }}>Open app</p>
+                <p style={{ margin: '1px 0 0', fontFamily: '"Instrument Sans", system-ui', fontSize: 11, color: '#65676B' }}>Open app</p>
               </div>
             </a>
           ))}
@@ -508,28 +508,28 @@ function FileCard({ post }) {
         display: 'flex', alignItems: 'center', gap: 12,
         padding: '12px 14px', borderRadius: 12, textDecoration: 'none',
         background: hovered ? '#F7F8FA' : 'white',
-        border: `1px solid ${hovered ? '#a5b4fc' : '#DADDE1'}`,
+        border: `1px solid ${hovered ? '#7EC8C8' : '#DADDE1'}`,
         transition: 'all 0.15s',
       }}
     >
       <div style={{
         width: 40, height: 40, borderRadius: 10,
-        background: '#EEF2FF', flexShrink: 0,
+        background: '#E6F4F4', flexShrink: 0,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
-        <FileText size={18} color="#4f46e5" />
+        <FileText size={18} color="#0D7377" />
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ margin: 0, fontFamily: '"DM Sans", system-ui', fontWeight: 600, fontSize: 14, color: '#050505', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <p style={{ margin: 0, fontFamily: '"Instrument Sans", system-ui', fontWeight: 600, fontSize: 14, color: '#050505', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {post.file_name || 'Attachment'}
         </p>
         {post.caption && (
-          <p style={{ margin: '2px 0 0', fontFamily: '"DM Sans", system-ui', fontSize: 12, color: '#65676B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <p style={{ margin: '2px 0 0', fontFamily: '"Instrument Sans", system-ui', fontSize: 12, color: '#65676B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {post.caption}
           </p>
         )}
       </div>
-      <File size={15} color={hovered ? '#4f46e5' : '#BCC0C4'} style={{ flexShrink: 0, transition: 'color 0.15s' }} />
+      <File size={15} color={hovered ? '#0D7377' : '#BCC0C4'} style={{ flexShrink: 0, transition: 'color 0.15s' }} />
     </a>
   )
 }
@@ -541,16 +541,16 @@ function LockedState({ onJoin }) {
       padding: '48px 24px', textAlign: 'center',
     }}>
       <div style={{ fontSize: 44, marginBottom: 10 }}>🔒</div>
-      <p style={{ margin: '0 0 6px', fontFamily: '"Syne", system-ui', fontWeight: 700, fontSize: 17, color: '#050505' }}>
+      <p style={{ margin: '0 0 6px', fontFamily: '"Bricolage Grotesque", system-ui', fontWeight: 700, fontSize: 17, color: '#050505' }}>
         Enroll to see content
       </p>
-      <p style={{ margin: '0 0 20px', fontFamily: '"DM Sans", system-ui', fontSize: 14, color: '#65676B' }}>
+      <p style={{ margin: '0 0 20px', fontFamily: '"Instrument Sans", system-ui', fontSize: 14, color: '#65676B' }}>
         Join this subject to access posts, files, and apps.
       </p>
       <button onClick={onJoin} style={{
         padding: '11px 28px', borderRadius: 10, border: 'none',
-        background: '#4f46e5', color: 'white', cursor: 'pointer',
-        fontFamily: '"DM Sans", system-ui', fontWeight: 700, fontSize: 15,
+        background: '#0D7377', color: 'white', cursor: 'pointer',
+        fontFamily: '"Instrument Sans", system-ui', fontWeight: 700, fontSize: 15,
         display: 'inline-flex', alignItems: 'center', gap: 6,
       }}>
         <Plus size={16} /> Join Subject
@@ -566,8 +566,8 @@ function EmptyCard({ emoji, title, subtitle }) {
       padding: '48px 24px', textAlign: 'center',
     }}>
       <div style={{ fontSize: 44, marginBottom: 10 }}>{emoji}</div>
-      <p style={{ margin: '0 0 6px', fontFamily: '"Syne", system-ui', fontWeight: 700, fontSize: 17, color: '#050505' }}>{title}</p>
-      <p style={{ margin: 0, fontFamily: '"DM Sans", system-ui', fontSize: 14, color: '#65676B' }}>{subtitle}</p>
+      <p style={{ margin: '0 0 6px', fontFamily: '"Bricolage Grotesque", system-ui', fontWeight: 700, fontSize: 17, color: '#050505' }}>{title}</p>
+      <p style={{ margin: 0, fontFamily: '"Instrument Sans", system-ui', fontSize: 14, color: '#65676B' }}>{subtitle}</p>
     </div>
   )
 }
