@@ -71,7 +71,7 @@ function Lightbox({ photos, initialIndex, onClose }) {
         <div style={{
           position: 'absolute', top: 20, left: '50%', transform: 'translateX(-50%)',
           background: 'rgba(255,255,255,0.15)', color: 'white',
-          fontSize: 13, fontWeight: 600, fontFamily: '"DM Sans", system-ui',
+          fontSize: 13, fontWeight: 600, fontFamily: '"Instrument Sans", system-ui',
           padding: '4px 14px', borderRadius: 20,
         }}>
           {activeIdx + 1} / {photos.length}
@@ -150,7 +150,7 @@ function PhotoGrid({ photos, onPhotoClick }) {
           background: 'rgba(0,0,0,0.5)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-          <span style={{ color: 'white', fontSize: 28, fontWeight: 800, fontFamily: '"DM Sans", system-ui' }}>
+          <span style={{ color: 'white', fontSize: 28, fontWeight: 800, fontFamily: '"Instrument Sans", system-ui' }}>
             +{remaining}
           </span>
         </div>
@@ -232,18 +232,18 @@ export default function PostCard({ post, currentUserId }) {
         {/* ── Announcement banner ── */}
         {isAnnouncement && (
           <div style={{
-            background: 'linear-gradient(90deg, #4f46e5, #7c3aed)',
+            background: 'linear-gradient(90deg, #0D7377, #0A5C60)',
             padding: '8px 16px',
             display: 'flex', alignItems: 'center', gap: 8,
           }}>
             <Megaphone size={14} color="white" style={{ opacity: 0.9 }} />
-            <span style={{ color: 'white', fontSize: 12, fontWeight: 700, fontFamily: '"DM Sans", system-ui', letterSpacing: 0.5, textTransform: 'uppercase' }}>
+            <span style={{ color: 'white', fontSize: 12, fontWeight: 700, fontFamily: '"Instrument Sans", system-ui', letterSpacing: 0.5, textTransform: 'uppercase' }}>
               Announcement
             </span>
             {post.due_date && (
               <span style={{
                 marginLeft: 'auto', color: 'rgba(255,255,255,0.85)',
-                fontSize: 12, fontFamily: '"DM Sans", system-ui',
+                fontSize: 12, fontFamily: '"Instrument Sans", system-ui',
                 display: 'flex', alignItems: 'center', gap: 4,
               }}>
                 <Calendar size={11} /> Due {format(new Date(post.due_date), 'MMM d, yyyy')}
@@ -261,21 +261,21 @@ export default function PostCard({ post, currentUserId }) {
           />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-              <span style={{ fontFamily: '"DM Sans", system-ui', fontWeight: 700, fontSize: 14, color: '#050505' }}>
+              <span style={{ fontFamily: '"Instrument Sans", system-ui', fontWeight: 700, fontSize: 14, color: '#050505' }}>
                 {post.profiles?.display_name || 'Unknown'}
               </span>
               {post.subjects && (
                 <span style={{
                   display: 'inline-flex', alignItems: 'center', gap: 3,
-                  background: '#EEF2FF', color: '#4f46e5',
-                  fontSize: 11, fontWeight: 600, fontFamily: '"DM Sans", system-ui',
+                  background: '#E6F4F4', color: '#0D7377',
+                  fontSize: 11, fontWeight: 600, fontFamily: '"Instrument Sans", system-ui',
                   padding: '2px 8px', borderRadius: 20,
                 }}>
                   <BookOpen size={10} /> {post.subjects.name}
                 </span>
               )}
             </div>
-            <p style={{ margin: 0, fontSize: 12, color: '#65676B', fontFamily: '"DM Sans", system-ui' }}>
+            <p style={{ margin: 0, fontSize: 12, color: '#65676B', fontFamily: '"Instrument Sans", system-ui' }}>
               {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
               {!isAnnouncement && (
                 <span style={{ marginLeft: 4, color: '#BCC0C4' }}>· Status</span>
@@ -300,14 +300,14 @@ export default function PostCard({ post, currentUserId }) {
           <div style={{ padding: '10px 16px', paddingBottom: photos.length > 0 ? 10 : 0 }}>
             <p style={{
               margin: 0, fontSize: 15, color: '#050505',
-              fontFamily: '"DM Sans", system-ui', lineHeight: 1.5,
+              fontFamily: '"Instrument Sans", system-ui', lineHeight: 1.5,
               whiteSpace: 'pre-wrap', wordBreak: 'break-word',
             }}>
               {displayCaption}
               {isLong && (
                 <button
                   onClick={() => setExpanded(e => !e)}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#65676B', fontWeight: 600, fontSize: 14, fontFamily: '"DM Sans", system-ui', marginLeft: 4, padding: 0 }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#65676B', fontWeight: 600, fontSize: 14, fontFamily: '"Instrument Sans", system-ui', marginLeft: 4, padding: 0 }}
                 >
                   {expanded ? ' See less' : ' See more'}
                 </button>
@@ -343,16 +343,16 @@ export default function PostCard({ post, currentUserId }) {
               >
                 <div style={{
                   width: 36, height: 36, borderRadius: 8,
-                  background: '#EEF2FF', flexShrink: 0,
+                  background: '#E6F4F4', flexShrink: 0,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  <FileText size={16} color="#4f46e5" />
+                  <FileText size={16} color="#0D7377" />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#050505', fontFamily: '"DM Sans", system-ui', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#050505', fontFamily: '"Instrument Sans", system-ui', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {file.name}
                   </p>
-                  <p style={{ margin: 0, fontSize: 12, color: '#65676B', fontFamily: '"DM Sans", system-ui' }}>
+                  <p style={{ margin: 0, fontSize: 12, color: '#65676B', fontFamily: '"Instrument Sans", system-ui' }}>
                     Tap to open
                   </p>
                 </div>
@@ -372,7 +372,7 @@ export default function PostCard({ post, currentUserId }) {
             }}>
               <Heart size={10} color="white" fill="white" />
             </div>
-            <span style={{ fontSize: 13, color: '#65676B', fontFamily: '"DM Sans", system-ui' }}>
+            <span style={{ fontSize: 13, color: '#65676B', fontFamily: '"Instrument Sans", system-ui' }}>
               {likeCount}
             </span>
           </div>
@@ -400,7 +400,7 @@ export default function PostCard({ post, currentUserId }) {
           <div style={{ marginLeft: 'auto' }}>
             <ActionBtn
               onClick={() => setSaved(s => !s)}
-              icon={<Bookmark size={18} fill={saved ? '#4f46e5' : 'none'} color={saved ? '#4f46e5' : '#65676B'} />}
+              icon={<Bookmark size={18} fill={saved ? '#0D7377' : 'none'} color={saved ? '#0D7377' : '#65676B'} />}
               label=""
             />
           </div>
@@ -427,7 +427,7 @@ function ActionBtn({ onClick, icon, label, active }) {
         padding: '8px 4px', border: 'none', cursor: 'pointer',
         background: hovered ? '#F0F2F5' : 'transparent',
         borderRadius: 8, transition: 'background 0.12s',
-        fontFamily: '"DM Sans", system-ui', fontWeight: 600, fontSize: 14,
+        fontFamily: '"Instrument Sans", system-ui', fontWeight: 600, fontSize: 14,
         color: active ? '#E41E3F' : '#65676B',
       }}
     >
