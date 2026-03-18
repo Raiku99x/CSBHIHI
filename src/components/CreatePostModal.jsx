@@ -3,66 +3,50 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import {
   X, Image, Paperclip, ChevronDown, Loader2,
-  Megaphone, FileText, Plus
+  Megaphone, FileText, Plus, Globe
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const MAX_PHOTOS = 20
-const MAX_FILES  = 10
+const MAX_FILES = 10
 
-export default function CreatePostModal({ onClose, onCreated, subjects }) {
+export default function CreatePostModal({ onClose, onCreated, subjects, defaultType = 'status' }) {
   const { user, profile } = useAuth()
   const [form, setForm] = useState({
-    caption: '', subject_id: '', post_type: 'status', due_date: ''
+    caption: '', subject_id: '', post_type: defaultType, due_date: ''
   })
-
-  /* multi-photo state */
-  const [photoFiles,    setPhotoFiles]    = useState([])   // File[]
-  const [photoPreviews, setPhotoPreviews] = useState([])   // object URLs[]
-
-  /* multi-file state */
-  const [attachFiles, setAttachFiles] = useState([])       // File[]
-
-  const [loading, setLoading]         = useState(false)
-  const [uploadProgress, setUploadProgress] = useState('')   // e.g. "Uploading photo 3 of 7…"
+  const [photoFiles, setPhotoFiles] = useState([])
+  const [photoPreviews, setPhotoPreviews] = useState([])
+  const [attachFiles, setAttachFiles] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState('')
   const photoRef = useRef()
-  const fileRef  = useRef()
-  const uploadCounter = useRef(0)   // guarantees unique paths even within the same ms
+  const fileRef = useRef()
+  const uploadCounter = useRef(0)
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
-  /* ── photo handlers ────────────────────────────────────────── */
   function handlePhoto(e) {
-    const chosen    = Array.from(e.target.files || [])
+    const chosen = Array.from(e.target.files || [])
     const remaining = MAX_PHOTOS - photoFiles.length
-    if (remaining <= 0) { toast.error(`Max ${MAX_PHOTOS} photos allowed`); return }
+    if (remaining <= 0) { toast.error(`Max ${MAX_PHOTOS} photos`); return }
     const toAdd = chosen.slice(0, remaining)
-    if (chosen.length > remaining) toast(`Only added ${remaining} photo${remaining !== 1 ? 's' : ''} (limit reached)`, { icon: '⚠️' })
-    setPhotoFiles(prev  => [...prev, ...toAdd])
+    setPhotoFiles(prev => [...prev, ...toAdd])
     setPhotoPreviews(prev => [...prev, ...toAdd.map(f => URL.createObjectURL(f))])
-    e.target.value = '' // reset so the same file can be re-selected
+    e.target.value = ''
   }
 
   function removePhoto(idx) {
     URL.revokeObjectURL(photoPreviews[idx])
-    setPhotoFiles(prev    => prev.filter((_, i) => i !== idx))
+    setPhotoFiles(prev => prev.filter((_, i) => i !== idx))
     setPhotoPreviews(prev => prev.filter((_, i) => i !== idx))
   }
 
-  function clearPhotos() {
-    photoPreviews.forEach(u => URL.revokeObjectURL(u))
-    setPhotoFiles([])
-    setPhotoPreviews([])
-  }
-
-  /* ── file handlers ─────────────────────────────────────────── */
   function handleFile(e) {
-    const chosen    = Array.from(e.target.files || [])
+    const chosen = Array.from(e.target.files || [])
     const remaining = MAX_FILES - attachFiles.length
-    if (remaining <= 0) { toast.error(`Max ${MAX_FILES} files allowed`); return }
-    const toAdd = chosen.slice(0, remaining)
-    if (chosen.length > remaining) toast(`Only added ${remaining} file${remaining !== 1 ? 's' : ''} (limit reached)`, { icon: '⚠️' })
-    setAttachFiles(prev => [...prev, ...toAdd])
+    if (remaining <= 0) { toast.error(`Max ${MAX_FILES} files`); return }
+    setAttachFiles(prev => [...prev, ...chosen.slice(0, remaining)])
     e.target.value = ''
   }
 
@@ -70,42 +54,35 @@ export default function CreatePostModal({ onClose, onCreated, subjects }) {
     setAttachFiles(prev => prev.filter((_, i) => i !== idx))
   }
 
-  /* ── upload helper — guaranteed unique path ────────────────── */
   async function uploadFile(file, bucket) {
-    const ext     = file.name.split('.').pop().toLowerCase()
+    const ext = file.name.split('.').pop().toLowerCase()
     const counter = ++uploadCounter.current
-    const path    = `${user.id}/${Date.now()}_${counter}_${Math.random().toString(36).slice(2)}.${ext}`
+    const path = `${user.id}/${Date.now()}_${counter}_${Math.random().toString(36).slice(2)}.${ext}`
     const { error } = await supabase.storage.from(bucket).upload(path, file)
     if (error) throw error
     const { data } = supabase.storage.from(bucket).getPublicUrl(path)
     return data.publicUrl
   }
 
-  /* ── submit ────────────────────────────────────────────────── */
   async function handleSubmit(e) {
     e.preventDefault()
     if (!form.caption.trim() && photoFiles.length === 0) {
-      toast.error('Add a caption or at least one photo')
+      toast.error('Add a caption or photo')
       return
     }
     setLoading(true)
-    setUploadProgress('')
     try {
-      /* ── upload photos ONE BY ONE (avoids Supabase storage race conditions) ── */
       let photo_url = null
       if (photoFiles.length > 0) {
         const urls = []
         for (let i = 0; i < photoFiles.length; i++) {
           setUploadProgress(`Uploading photo ${i + 1} of ${photoFiles.length}…`)
-          const url = await uploadFile(photoFiles[i], 'post-media')
-          urls.push(url)
+          urls.push(await uploadFile(photoFiles[i], 'post-media'))
         }
         photo_url = JSON.stringify(urls)
       }
 
-      /* ── upload attachments ONE BY ONE ── */
-      let file_url  = null
-      let file_name = null
+      let file_url = null, file_name = null
       if (attachFiles.length > 0) {
         const results = []
         for (let i = 0; i < attachFiles.length; i++) {
@@ -113,52 +90,42 @@ export default function CreatePostModal({ onClose, onCreated, subjects }) {
           const url = await uploadFile(attachFiles[i], 'post-media')
           results.push({ url, name: attachFiles[i].name })
         }
-        file_url  = JSON.stringify(results.map(r => r.url))
+        file_url = JSON.stringify(results.map(r => r.url))
         file_name = JSON.stringify(results.map(r => r.name))
       }
 
-      setUploadProgress('Saving post…')
-
-      const postData = {
-        author_id:  user.id,
-        subject_id: form.subject_id || null,
-        caption:    form.caption.trim(),
-        photo_url,
-        file_url,
-        file_name,
-        post_type:  form.post_type,
-        due_date:   form.post_type === 'announcement' && form.due_date ? form.due_date : null,
-      }
-
+      setUploadProgress('Saving…')
       const { data: post, error } = await supabase
         .from('posts')
-        .insert(postData)
+        .insert({
+          author_id: user.id,
+          subject_id: form.subject_id || null,
+          caption: form.caption.trim(),
+          photo_url, file_url, file_name,
+          post_type: form.post_type,
+          due_date: form.post_type === 'announcement' && form.due_date ? form.due_date : null,
+        })
         .select('*, profiles(*), subjects(*)')
         .single()
 
       if (error) throw error
 
-      /* announce notifications */
       if (form.post_type === 'announcement' && form.subject_id) {
         const { data: enrolled } = await supabase
-          .from('user_subjects')
-          .select('user_id')
-          .eq('subject_id', form.subject_id)
-          .neq('user_id', user.id)
-
+          .from('user_subjects').select('user_id')
+          .eq('subject_id', form.subject_id).neq('user_id', user.id)
         if (enrolled?.length) {
-          const notifs = enrolled.map(e => ({
-            user_id:  e.user_id,
-            post_id:  post.id,
-            type:     'announcement',
-            message:  `📢 New announcement in ${post.subjects?.name || 'a subject'}: "${form.caption.slice(0, 60)}${form.caption.length > 60 ? '…' : ''}"`,
-            is_read:  false,
-          }))
-          await supabase.from('notifications').insert(notifs)
+          await supabase.from('notifications').insert(
+            enrolled.map(e => ({
+              user_id: e.user_id, post_id: post.id, type: 'announcement',
+              message: `📢 New announcement in ${post.subjects?.name || 'a subject'}: "${form.caption.slice(0, 60)}${form.caption.length > 60 ? '…' : ''}"`,
+              is_read: false,
+            }))
+          )
         }
       }
 
-      toast.success(form.post_type === 'announcement' ? 'Announcement posted!' : 'Post shared!')
+      toast.success(form.post_type === 'announcement' ? 'Announcement posted!' : 'Posted!')
       onCreated(post)
       onClose()
     } catch (err) {
@@ -169,226 +136,325 @@ export default function CreatePostModal({ onClose, onCreated, subjects }) {
     }
   }
 
-  /* ── render ────────────────────────────────────────────────── */
+  const isAnnouncement = form.post_type === 'announcement'
+
   return (
-    <div className="modal-backdrop" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="modal-panel">
+    <div
+      onClick={e => e.target === e.currentTarget && onClose()}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 50,
+        background: 'rgba(0,0,0,0.65)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: 16,
+      }}
+    >
+      <div style={{
+        background: 'white', borderRadius: 16,
+        width: '100%', maxWidth: 500,
+        maxHeight: '90vh', overflowY: 'auto',
+        boxShadow: '0 24px 56px rgba(0,0,0,0.22)',
+        animation: 'modalIn 0.22s ease',
+      }}>
+
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-          <h2 className="font-display font-bold text-lg text-slate-800">Create Post</h2>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors">
-            <X size={18} className="text-slate-500" />
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: '14px 16px',
+          borderBottom: '1px solid #E4E6EB',
+          position: 'relative',
+        }}>
+          <span style={{ fontFamily: '"Syne", system-ui', fontWeight: 800, fontSize: 17, color: '#050505' }}>
+            Create Post
+          </span>
+          <button
+            onClick={onClose}
+            style={{
+              position: 'absolute', right: 12,
+              width: 36, height: 36, borderRadius: '50%',
+              background: '#E4E6EB', border: 'none', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              transition: 'background 0.12s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = '#CED0D4'}
+            onMouseLeave={e => e.currentTarget.style.background = '#E4E6EB'}
+          >
+            <X size={18} color="#050505" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-5 space-y-4">
-          {/* Author row */}
-          <div className="flex items-center gap-3">
-            <img
-              src={profile?.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=U`}
-              className="w-10 h-10 rounded-xl object-cover bg-slate-100"
-              alt="you"
-            />
-            <div>
-              <p className="font-semibold text-sm text-slate-800">{profile?.display_name}</p>
-              <p className="text-xs text-slate-400">Sharing to feed</p>
-            </div>
-          </div>
+        <form onSubmit={handleSubmit}>
+          <div style={{ padding: '12px 16px' }}>
 
-          {/* Post type toggle */}
-          <div className="flex p-1 bg-slate-100 rounded-xl">
-            <button
-              type="button"
-              onClick={() => set('post_type', 'status')}
-              className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all ${
-                form.post_type === 'status' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500'
-              }`}
-            >
-              <FileText size={14} /> Status
-            </button>
-            <button
-              type="button"
-              onClick={() => set('post_type', 'announcement')}
-              className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all ${
-                form.post_type === 'announcement' ? 'bg-brand-600 text-white shadow-sm' : 'text-slate-500'
-              }`}
-            >
-              <Megaphone size={14} /> Announcement
-            </button>
-          </div>
-
-          {/* Caption */}
-          <textarea
-            className="textarea"
-            placeholder={form.post_type === 'announcement' ? "What's the announcement?" : "What's on your mind?"}
-            rows={3}
-            value={form.caption}
-            onChange={e => set('caption', e.target.value)}
-          />
-
-          {/* Subject selector */}
-          <div className="relative">
-            <select
-              className="input appearance-none pr-9"
-              value={form.subject_id}
-              onChange={e => set('subject_id', e.target.value)}
-            >
-              <option value="">No subject (General)</option>
-              {subjects.map(s => (
-                <option key={s.id} value={s.id}>{s.name}</option>
-              ))}
-            </select>
-            <ChevronDown size={15} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-          </div>
-
-          {/* Due date (announcements only) */}
-          {form.post_type === 'announcement' && (
-            <div>
-              <label className="text-xs font-medium text-slate-500 mb-1.5 block">Due Date (optional)</label>
-              <input
-                type="date"
-                className="input"
-                value={form.due_date}
-                onChange={e => set('due_date', e.target.value)}
-                min={new Date().toISOString().split('T')[0]}
+            {/* Author row */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+              <img
+                src={profile?.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=U`}
+                style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', background: '#E4E6EB' }}
+                alt=""
               />
-            </div>
-          )}
-
-          {/* ── Photo previews grid ──────────────────────────── */}
-          {photoPreviews.length > 0 && (
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-xs font-medium text-slate-500">
-                  {photoPreviews.length} / {MAX_PHOTOS} photos
+              <div>
+                <p style={{ margin: 0, fontFamily: '"DM Sans", system-ui', fontWeight: 700, fontSize: 15, color: '#050505' }}>
+                  {profile?.display_name}
                 </p>
-                <button
-                  type="button"
-                  onClick={clearPhotos}
-                  className="text-xs text-rose-500 hover:text-rose-600 font-medium"
-                >
-                  Remove all
-                </button>
+                <div style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                  background: '#E4E6EB', padding: '3px 10px', borderRadius: 6, marginTop: 3,
+                  cursor: 'default',
+                }}>
+                  <Globe size={11} color="#050505" />
+                  <span style={{ fontFamily: '"DM Sans", system-ui', fontWeight: 600, fontSize: 12, color: '#050505' }}>
+                    Class
+                  </span>
+                </div>
               </div>
+            </div>
 
-              <div className="grid grid-cols-3 gap-2">
-                {photoPreviews.map((url, i) => (
-                  <div key={i} className="relative aspect-square rounded-xl overflow-hidden bg-slate-100">
-                    <img src={url} className="w-full h-full object-cover" alt={`preview ${i + 1}`} />
-                    <button
-                      type="button"
-                      onClick={() => removePhoto(i)}
-                      className="absolute top-1 right-1 p-1 bg-black/60 rounded-full text-white hover:bg-black/80 transition-colors"
-                    >
-                      <X size={11} />
+            {/* Post type toggle */}
+            <div style={{
+              display: 'flex', gap: 6, padding: 4,
+              background: '#F0F2F5', borderRadius: 10, marginBottom: 14,
+            }}>
+              {[
+                { key: 'status', label: 'Status', icon: <FileText size={14} /> },
+                { key: 'announcement', label: 'Announcement', icon: <Megaphone size={14} /> },
+              ].map(({ key, label, icon }) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => set('post_type', key)}
+                  style={{
+                    flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                    padding: '7px 0', borderRadius: 8, border: 'none', cursor: 'pointer',
+                    fontFamily: '"DM Sans", system-ui', fontWeight: 600, fontSize: 13,
+                    background: form.post_type === key
+                      ? key === 'announcement' ? '#4f46e5' : 'white'
+                      : 'transparent',
+                    color: form.post_type === key
+                      ? key === 'announcement' ? 'white' : '#050505'
+                      : '#65676B',
+                    boxShadow: form.post_type === key && key === 'status' ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  {icon} {label}
+                </button>
+              ))}
+            </div>
+
+            {/* Textarea */}
+            <textarea
+              placeholder={isAnnouncement ? "What's the announcement?" : `What's on your mind, ${profile?.display_name?.split(' ')[0] || 'there'}?`}
+              rows={4}
+              value={form.caption}
+              onChange={e => set('caption', e.target.value)}
+              style={{
+                width: '100%', border: 'none', outline: 'none', resize: 'none',
+                fontFamily: '"DM Sans", system-ui', fontSize: 18, color: '#050505',
+                background: 'transparent', lineHeight: 1.5,
+                placeholder: { color: '#65676B' },
+              }}
+            />
+
+            {/* Subject selector */}
+            <div style={{ position: 'relative', marginTop: 8 }}>
+              <select
+                value={form.subject_id}
+                onChange={e => set('subject_id', e.target.value)}
+                style={{
+                  width: '100%', padding: '10px 36px 10px 14px',
+                  borderRadius: 10, border: '1px solid #E4E6EB',
+                  background: '#F7F8FA', appearance: 'none',
+                  fontFamily: '"DM Sans", system-ui', fontSize: 14, color: '#050505',
+                  cursor: 'pointer', outline: 'none',
+                }}
+              >
+                <option value="">No subject (General)</option>
+                {subjects.map(s => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+              <ChevronDown size={15} color="#65676B" style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+            </div>
+
+            {/* Due date */}
+            {isAnnouncement && (
+              <div style={{ marginTop: 10 }}>
+                <label style={{ fontFamily: '"DM Sans", system-ui', fontSize: 12, fontWeight: 600, color: '#65676B', display: 'block', marginBottom: 6 }}>
+                  Due Date (optional)
+                </label>
+                <input
+                  type="date"
+                  value={form.due_date}
+                  onChange={e => set('due_date', e.target.value)}
+                  min={new Date().toISOString().split('T')[0]}
+                  style={{
+                    width: '100%', padding: '10px 14px',
+                    borderRadius: 10, border: '1px solid #E4E6EB',
+                    fontFamily: '"DM Sans", system-ui', fontSize: 14, color: '#050505',
+                    background: '#F7F8FA', outline: 'none',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+            )}
+
+            {/* Photo previews */}
+            {photoPreviews.length > 0 && (
+              <div style={{ marginTop: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <span style={{ fontFamily: '"DM Sans", system-ui', fontSize: 12, fontWeight: 600, color: '#65676B' }}>
+                    {photoPreviews.length}/{MAX_PHOTOS} photos
+                  </span>
+                  <button type="button" onClick={() => { photoPreviews.forEach(u => URL.revokeObjectURL(u)); setPhotoFiles([]); setPhotoPreviews([]) }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#E41E3F', fontSize: 12, fontWeight: 600, fontFamily: '"DM Sans", system-ui' }}>
+                    Remove all
+                  </button>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+                  {photoPreviews.map((url, i) => (
+                    <div key={i} style={{ position: 'relative', aspectRatio: '1/1', borderRadius: 10, overflow: 'hidden', background: '#E4E6EB' }}>
+                      <img src={url} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} alt="" />
+                      <button type="button" onClick={() => removePhoto(i)}
+                        style={{
+                          position: 'absolute', top: 4, right: 4,
+                          width: 22, height: 22, borderRadius: '50%',
+                          background: 'rgba(0,0,0,0.6)', border: 'none', cursor: 'pointer',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        }}>
+                        <X size={11} color="white" />
+                      </button>
+                    </div>
+                  ))}
+                  {photoPreviews.length < MAX_PHOTOS && (
+                    <button type="button" onClick={() => photoRef.current.click()}
+                      style={{
+                        aspectRatio: '1/1', borderRadius: 10,
+                        border: '2px dashed #CED0D4', background: 'transparent', cursor: 'pointer',
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4,
+                        color: '#65676B',
+                      }}>
+                      <Plus size={18} />
+                      <span style={{ fontSize: 11, fontFamily: '"DM Sans", system-ui', fontWeight: 600 }}>Add</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* File list */}
+            {attachFiles.length > 0 && (
+              <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {attachFiles.map((file, i) => (
+                  <div key={i} style={{
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    padding: '8px 12px', background: '#F7F8FA',
+                    borderRadius: 10, border: '1px solid #E4E6EB',
+                  }}>
+                    <FileText size={15} color="#4f46e5" />
+                    <span style={{ flex: 1, fontSize: 13, color: '#050505', fontFamily: '"DM Sans", system-ui', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {file.name}
+                    </span>
+                    <button type="button" onClick={() => removeFile(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex' }}>
+                      <X size={14} color="#65676B" />
                     </button>
                   </div>
                 ))}
-
-                {/* Add more slot */}
-                {photoPreviews.length < MAX_PHOTOS && (
-                  <button
-                    type="button"
-                    onClick={() => photoRef.current.click()}
-                    className="aspect-square rounded-xl border-2 border-dashed border-slate-300 flex flex-col items-center justify-center gap-1 text-slate-400 hover:border-brand-400 hover:text-brand-400 transition-colors"
-                  >
-                    <Plus size={20} />
-                    <span className="text-[10px] font-medium">Add</span>
-                  </button>
-                )}
               </div>
-            </div>
-          )}
-
-          {/* ── File attachment list ─────────────────────────── */}
-          {attachFiles.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-xs font-medium text-slate-500">{attachFiles.length} / {MAX_FILES} files</p>
-              {attachFiles.map((file, i) => (
-                <div
-                  key={i}
-                  className="flex items-center gap-2 p-2.5 bg-slate-50 rounded-xl border border-slate-200"
-                >
-                  <FileText size={15} className="text-brand-600 flex-shrink-0" />
-                  <span className="text-sm text-slate-600 flex-1 truncate">{file.name}</span>
-                  <button type="button" onClick={() => removeFile(i)}>
-                    <X size={14} className="text-slate-400 hover:text-rose-400 transition-colors" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Hidden inputs */}
-          <input
-            ref={photoRef}
-            type="file"
-            accept="image/*"
-            multiple
-            className="hidden"
-            onChange={handlePhoto}
-          />
-          <input
-            ref={fileRef}
-            type="file"
-            multiple
-            className="hidden"
-            onChange={handleFile}
-          />
+          <input ref={photoRef} type="file" accept="image/*" multiple className="hidden" onChange={handlePhoto} style={{ display: 'none' }} />
+          <input ref={fileRef} type="file" multiple style={{ display: 'none' }} onChange={handleFile} />
 
-          {/* Media buttons + submit */}
-          <div className="flex items-center gap-2 pt-1 border-t border-slate-100">
-            {/* Photo button */}
-            <button
-              type="button"
-              onClick={() => photoRef.current.click()}
-              disabled={photoFiles.length >= MAX_PHOTOS}
-              className={`btn-ghost transition-colors ${
-                photoFiles.length >= MAX_PHOTOS
-                  ? 'opacity-40 cursor-not-allowed'
-                  : 'text-emerald-600 hover:bg-emerald-50'
-              }`}
-            >
-              <Image size={16} />
-              Photos
-              {photoFiles.length > 0 && (
-                <span className="ml-0.5 text-xs bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full font-semibold">
-                  {photoFiles.length}
-                </span>
-              )}
-            </button>
+          {/* Add to post bar */}
+          <div style={{
+            margin: '0 16px 12px',
+            padding: '8px 14px',
+            borderRadius: 12, border: '1px solid #E4E6EB',
+            display: 'flex', alignItems: 'center',
+          }}>
+            <span style={{ fontFamily: '"DM Sans", system-ui', fontWeight: 600, fontSize: 14, color: '#050505', flex: 1 }}>
+              Add to your post
+            </span>
+            <div style={{ display: 'flex', gap: 4 }}>
+              <MediaBtn
+                icon={<Image size={22} color="#45BD62" />}
+                title="Photos"
+                onClick={() => photoRef.current.click()}
+                badge={photoFiles.length > 0 ? photoFiles.length : null}
+              />
+              <MediaBtn
+                icon={<Paperclip size={22} color="#4f46e5" />}
+                title="Files"
+                onClick={() => fileRef.current.click()}
+                badge={attachFiles.length > 0 ? attachFiles.length : null}
+              />
+            </div>
+          </div>
 
-            {/* File button */}
-            <button
-              type="button"
-              onClick={() => fileRef.current.click()}
-              disabled={attachFiles.length >= MAX_FILES}
-              className={`btn-ghost transition-colors ${
-                attachFiles.length >= MAX_FILES
-                  ? 'opacity-40 cursor-not-allowed'
-                  : 'text-brand-600 hover:bg-brand-50'
-              }`}
-            >
-              <Paperclip size={16} />
-              Files
-              {attachFiles.length > 0 && (
-                <span className="ml-0.5 text-xs bg-brand-100 text-brand-700 px-1.5 py-0.5 rounded-full font-semibold">
-                  {attachFiles.length}
-                </span>
-              )}
-            </button>
-
+          {/* Submit */}
+          <div style={{ padding: '0 16px 16px' }}>
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary ml-auto"
+              style={{
+                width: '100%', padding: '12px 0',
+                borderRadius: 10, border: 'none',
+                background: loading ? '#a5b4fc' : '#4f46e5',
+                color: 'white', cursor: loading ? 'not-allowed' : 'pointer',
+                fontFamily: '"DM Sans", system-ui', fontWeight: 700, fontSize: 16,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                transition: 'background 0.15s, transform 0.1s',
+              }}
+              onMouseDown={e => { if (!loading) e.currentTarget.style.transform = 'scale(0.985)' }}
+              onMouseUp={e => { e.currentTarget.style.transform = 'scale(1)' }}
             >
-              {loading && <Loader2 size={15} className="animate-spin" />}
+              {loading && <Loader2 size={17} style={{ animation: 'spin 0.8s linear infinite' }} />}
               {loading ? (uploadProgress || 'Posting…') : 'Post'}
             </button>
           </div>
         </form>
       </div>
+
+      <style>{`
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.96) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+      `}</style>
     </div>
+  )
+}
+
+function MediaBtn({ icon, title, onClick, badge }) {
+  const [hovered, setHovered] = useState(false)
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      title={title}
+      style={{
+        position: 'relative', width: 38, height: 38, borderRadius: '50%',
+        background: hovered ? '#F0F2F5' : 'transparent',
+        border: 'none', cursor: 'pointer',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        transition: 'background 0.12s',
+      }}
+    >
+      {icon}
+      {badge && (
+        <span style={{
+          position: 'absolute', top: 2, right: 2,
+          minWidth: 16, height: 16, borderRadius: 8,
+          background: '#4f46e5', color: 'white',
+          fontSize: 10, fontWeight: 700, fontFamily: '"DM Sans", system-ui',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: '0 3px',
+        }}>
+          {badge}
+        </span>
+      )}
+    </button>
   )
 }
