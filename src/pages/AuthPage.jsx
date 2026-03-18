@@ -39,21 +39,33 @@ export default function AuthPage() {
 
         {/* Left — branding (visible on desktop) */}
         <div className="hidden lg:flex flex-col gap-4 flex-1 max-w-sm">
-          {/* Logo */}
+          {/* CSB Logo + EduBoard */}
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-[#0D7377] flex items-center justify-center shadow-lg">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path d="M4 19l4-4m0 0l4-4m-4 4l4 4m4-8l4-4" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M12 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="white" strokeWidth="2.2" strokeLinecap="round"/>
-              </svg>
-            </div>
+            <img
+              src="/pwa-512x512.png"
+              alt="CSB Logo"
+              style={{
+                width: 56, height: 56,
+                borderRadius: 16,
+                objectFit: 'cover',
+                boxShadow: '0 4px 16px rgba(13,115,119,0.25)',
+              }}
+            />
             <span
-              style={{ fontFamily: '"Bricolage Grotesque", system-ui, sans-serif', fontWeight: 800, fontSize: 28, letterSpacing: '-0.5px', color: '#1c1e21' }}
+              style={{
+                fontFamily: '"Bricolage Grotesque", system-ui, sans-serif',
+                fontWeight: 800, fontSize: 28,
+                letterSpacing: '-0.5px', color: '#1c1e21',
+              }}
             >
               EduBoard
             </span>
           </div>
-          <p style={{ fontFamily: '"Instrument Sans", system-ui', fontSize: 26, fontWeight: 400, color: '#1c1e21', lineHeight: 1.3 }}>
+          <p style={{
+            fontFamily: '"Instrument Sans", system-ui',
+            fontSize: 26, fontWeight: 400,
+            color: '#1c1e21', lineHeight: 1.3,
+          }}>
             Connect with your class and stay on top of everything.
           </p>
         </div>
@@ -62,14 +74,22 @@ export default function AuthPage() {
         <div className="w-full max-w-[396px]">
 
           {/* Mobile logo */}
-          <div className="lg:hidden flex flex-col items-center gap-2 mb-8">
-            <div className="w-14 h-14 rounded-3xl bg-[#0D7377] flex items-center justify-center shadow-lg">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                <path d="M4 19l4-4m0 0l4-4m-4 4l4 4m4-8l4-4" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M12 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="white" strokeWidth="2.2" strokeLinecap="round"/>
-              </svg>
-            </div>
-            <span style={{ fontFamily: '"Bricolage Grotesque", system-ui', fontWeight: 800, fontSize: 26, letterSpacing: '-0.5px', color: '#1c1e21' }}>
+          <div className="lg:hidden flex flex-col items-center gap-3 mb-8">
+            <img
+              src="/pwa-512x512.png"
+              alt="CSB Logo"
+              style={{
+                width: 72, height: 72,
+                borderRadius: 20,
+                objectFit: 'cover',
+                boxShadow: '0 6px 24px rgba(13,115,119,0.2)',
+              }}
+            />
+            <span style={{
+              fontFamily: '"Bricolage Grotesque", system-ui',
+              fontWeight: 800, fontSize: 26,
+              letterSpacing: '-0.5px', color: '#1c1e21',
+            }}>
               EduBoard
             </span>
           </div>
