@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useNotifications } from '../hooks/useNotifications'
 import {
   Home, MessageSquare, Bell, BookMarked, Grid3X3,
-  LogOut, Settings, Check, X, ChevronDown
+  LogOut, Settings, Check, X, ChevronDown, Download
 } from 'lucide-react'
 
 const AVATAR_HEX = ['0D7377','0A5C60','3D5166','4A6070','2D6A4F','3A6EA5','2E5F8A','5C4A7A','6B5B8A','7A5C42','8A6A50','8A4A4B','7A3D3E','647A3A','596B32','1A7A80','156870','3A4F70','2E4260','7A3A35','6A2E2A','156A6E','0F5F63','4A3A7A','3E3068']
@@ -14,6 +14,69 @@ function dicebearUrl(name = '') {
   return `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name || 'U')}&backgroundColor=${hex}&textColor=ffffff`
 }
 import { formatDistanceToNow } from 'date-fns'
+
+function InstallPrompt() {
+  const [installEvent, setInstallEvent] = useState(null)
+  const [installed, setInstalled] = useState(false)
+
+  useEffect(() => {
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      setInstalled(true)
+      return
+    }
+
+    function handleBeforeInstall(e) {
+      e.preventDefault()
+      setInstallEvent(e)
+    }
+
+    function handleAppInstalled() {
+      setInstalled(true)
+      setInstallEvent(null)
+    }
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstall)
+    window.addEventListener('appinstalled', handleAppInstalled)
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstall)
+      window.removeEventListener('appinstalled', handleAppInstalled)
+    }
+  }, [])
+
+  async function handleInstall() {
+    if (!installEvent) return
+    installEvent.prompt()
+    const { outcome } = await installEvent.userChoice
+    if (outcome === 'accepted') {
+      setInstallEvent(null)
+      setInstalled(true)
+    }
+  }
+
+  if (installed || !installEvent) return null
+
+  return (
+    <button
+      onClick={handleInstall}
+      style={{
+        display: 'flex', alignItems: 'center', gap: 6,
+        padding: '6px 12px', borderRadius: 20, border: 'none',
+        background: '#0D7377', color: 'white', cursor: 'pointer',
+        fontFamily: '"Instrument Sans", system-ui', fontWeight: 700, fontSize: 12,
+        transition: 'background 0.15s, transform 0.1s',
+        flexShrink: 0,
+      }}
+      onMouseEnter={e => e.currentTarget.style.background = '#0A5C60'}
+      onMouseLeave={e => e.currentTarget.style.background = '#0D7377'}
+      onMouseDown={e => e.currentTarget.style.transform = 'scale(0.95)'}
+      onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
+    >
+      <Download size={13} />
+      Install App
+    </button>
+  )
+}
 
 export default function Layout({ children }) {
   const { profile, signOut } = useAuth()
@@ -81,6 +144,9 @@ export default function Layout({ children }) {
 
           {/* Right actions */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+
+            {/* Install button */}
+            <InstallPrompt />
 
             {/* Notification bell */}
             <div ref={notifRef} style={{ position: 'relative' }}>
