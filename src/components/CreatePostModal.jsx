@@ -163,7 +163,7 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
           borderBottom: '1px solid #E4E6EB',
           position: 'relative',
         }}>
-          <span style={{ fontFamily: '"Syne", system-ui', fontWeight: 800, fontSize: 17, color: '#050505' }}>
+          <span style={{ fontFamily: '"Bricolage Grotesque", system-ui', fontWeight: 800, fontSize: 17, color: '#050505' }}>
             Create Post
           </span>
           <button
@@ -193,7 +193,7 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
                 alt=""
               />
               <div>
-                <p style={{ margin: 0, fontFamily: '"DM Sans", system-ui', fontWeight: 700, fontSize: 15, color: '#050505' }}>
+                <p style={{ margin: 0, fontFamily: '"Instrument Sans", system-ui', fontWeight: 700, fontSize: 15, color: '#050505' }}>
                   {profile?.display_name}
                 </p>
                 <div style={{
@@ -202,7 +202,7 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
                   cursor: 'default',
                 }}>
                   <Globe size={11} color="#050505" />
-                  <span style={{ fontFamily: '"DM Sans", system-ui', fontWeight: 600, fontSize: 12, color: '#050505' }}>
+                  <span style={{ fontFamily: '"Instrument Sans", system-ui', fontWeight: 600, fontSize: 12, color: '#050505' }}>
                     Class
                   </span>
                 </div>
@@ -225,9 +225,9 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
                   style={{
                     flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                     padding: '7px 0', borderRadius: 8, border: 'none', cursor: 'pointer',
-                    fontFamily: '"DM Sans", system-ui', fontWeight: 600, fontSize: 13,
+                    fontFamily: '"Instrument Sans", system-ui', fontWeight: 600, fontSize: 13,
                     background: form.post_type === key
-                      ? key === 'announcement' ? '#4f46e5' : 'white'
+                      ? key === 'announcement' ? '#0D7377' : 'white'
                       : 'transparent',
                     color: form.post_type === key
                       ? key === 'announcement' ? 'white' : '#050505'
@@ -249,7 +249,7 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
               onChange={e => set('caption', e.target.value)}
               style={{
                 width: '100%', border: 'none', outline: 'none', resize: 'none',
-                fontFamily: '"DM Sans", system-ui', fontSize: 18, color: '#050505',
+                fontFamily: '"Instrument Sans", system-ui', fontSize: 18, color: '#050505',
                 background: 'transparent', lineHeight: 1.5,
                 placeholder: { color: '#65676B' },
               }}
@@ -264,7 +264,7 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
                   width: '100%', padding: '10px 36px 10px 14px',
                   borderRadius: 10, border: '1px solid #E4E6EB',
                   background: '#F7F8FA', appearance: 'none',
-                  fontFamily: '"DM Sans", system-ui', fontSize: 14, color: '#050505',
+                  fontFamily: '"Instrument Sans", system-ui', fontSize: 14, color: '#050505',
                   cursor: 'pointer', outline: 'none',
                 }}
               >
@@ -279,7 +279,7 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
             {/* Due date */}
             {isAnnouncement && (
               <div style={{ marginTop: 10 }}>
-                <label style={{ fontFamily: '"DM Sans", system-ui', fontSize: 12, fontWeight: 600, color: '#65676B', display: 'block', marginBottom: 6 }}>
+                <label style={{ fontFamily: '"Instrument Sans", system-ui', fontSize: 12, fontWeight: 600, color: '#65676B', display: 'block', marginBottom: 6 }}>
                   Due Date (optional)
                 </label>
                 <input
@@ -290,7 +290,7 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
                   style={{
                     width: '100%', padding: '10px 14px',
                     borderRadius: 10, border: '1px solid #E4E6EB',
-                    fontFamily: '"DM Sans", system-ui', fontSize: 14, color: '#050505',
+                    fontFamily: '"Instrument Sans", system-ui', fontSize: 14, color: '#050505',
                     background: '#F7F8FA', outline: 'none',
                     boxSizing: 'border-box',
                   }}
@@ -302,11 +302,11 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
             {photoPreviews.length > 0 && (
               <div style={{ marginTop: 12 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                  <span style={{ fontFamily: '"DM Sans", system-ui', fontSize: 12, fontWeight: 600, color: '#65676B' }}>
+                  <span style={{ fontFamily: '"Instrument Sans", system-ui', fontSize: 12, fontWeight: 600, color: '#65676B' }}>
                     {photoPreviews.length}/{MAX_PHOTOS} photos
                   </span>
                   <button type="button" onClick={() => { photoPreviews.forEach(u => URL.revokeObjectURL(u)); setPhotoFiles([]); setPhotoPreviews([]) }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#E41E3F', fontSize: 12, fontWeight: 600, fontFamily: '"DM Sans", system-ui' }}>
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#E41E3F', fontSize: 12, fontWeight: 600, fontFamily: '"Instrument Sans", system-ui' }}>
                     Remove all
                   </button>
                 </div>
@@ -334,7 +334,7 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
                         color: '#65676B',
                       }}>
                       <Plus size={18} />
-                      <span style={{ fontSize: 11, fontFamily: '"DM Sans", system-ui', fontWeight: 600 }}>Add</span>
+                      <span style={{ fontSize: 11, fontFamily: '"Instrument Sans", system-ui', fontWeight: 600 }}>Add</span>
                     </button>
                   )}
                 </div>
@@ -350,8 +350,8 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
                     padding: '8px 12px', background: '#F7F8FA',
                     borderRadius: 10, border: '1px solid #E4E6EB',
                   }}>
-                    <FileText size={15} color="#4f46e5" />
-                    <span style={{ flex: 1, fontSize: 13, color: '#050505', fontFamily: '"DM Sans", system-ui', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <FileText size={15} color="#0D7377" />
+                    <span style={{ flex: 1, fontSize: 13, color: '#050505', fontFamily: '"Instrument Sans", system-ui', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {file.name}
                     </span>
                     <button type="button" onClick={() => removeFile(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex' }}>
@@ -374,7 +374,7 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
             borderRadius: 12, border: '1px solid #E4E6EB',
             display: 'flex', alignItems: 'center',
           }}>
-            <span style={{ fontFamily: '"DM Sans", system-ui', fontWeight: 600, fontSize: 14, color: '#050505', flex: 1 }}>
+            <span style={{ fontFamily: '"Instrument Sans", system-ui', fontWeight: 600, fontSize: 14, color: '#050505', flex: 1 }}>
               Add to your post
             </span>
             <div style={{ display: 'flex', gap: 4 }}>
@@ -385,7 +385,7 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
                 badge={photoFiles.length > 0 ? photoFiles.length : null}
               />
               <MediaBtn
-                icon={<Paperclip size={22} color="#4f46e5" />}
+                icon={<Paperclip size={22} color="#0D7377" />}
                 title="Files"
                 onClick={() => fileRef.current.click()}
                 badge={attachFiles.length > 0 ? attachFiles.length : null}
@@ -401,9 +401,9 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
               style={{
                 width: '100%', padding: '12px 0',
                 borderRadius: 10, border: 'none',
-                background: loading ? '#a5b4fc' : '#4f46e5',
+                background: loading ? '#7EC8C8' : '#0D7377',
                 color: 'white', cursor: loading ? 'not-allowed' : 'pointer',
-                fontFamily: '"DM Sans", system-ui', fontWeight: 700, fontSize: 16,
+                fontFamily: '"Instrument Sans", system-ui', fontWeight: 700, fontSize: 16,
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 transition: 'background 0.15s, transform 0.1s',
               }}
@@ -447,8 +447,8 @@ function MediaBtn({ icon, title, onClick, badge }) {
         <span style={{
           position: 'absolute', top: 2, right: 2,
           minWidth: 16, height: 16, borderRadius: 8,
-          background: '#4f46e5', color: 'white',
-          fontSize: 10, fontWeight: 700, fontFamily: '"DM Sans", system-ui',
+          background: '#0D7377', color: 'white',
+          fontSize: 10, fontWeight: 700, fontFamily: '"Instrument Sans", system-ui',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           padding: '0 3px',
         }}>
