@@ -138,7 +138,7 @@ export default function FeedPage() {
           />
           <ComposeAction
             icon={<Image size={20} color="#45BD62" />}
-            label="Photo/Video"
+            label="Photo"
             onClick={handlePhotoClick}
           />
           <ComposeAction
