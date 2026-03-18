@@ -41,7 +41,7 @@ export default function AuthPage() {
         <div className="hidden lg:flex flex-col gap-4 flex-1 max-w-sm">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-[#4f46e5] flex items-center justify-center shadow-lg">
+            <div className="w-12 h-12 rounded-2xl bg-[#0D7377] flex items-center justify-center shadow-lg">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                 <path d="M4 19l4-4m0 0l4-4m-4 4l4 4m4-8l4-4" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M12 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="white" strokeWidth="2.2" strokeLinecap="round"/>
@@ -63,7 +63,7 @@ export default function AuthPage() {
 
           {/* Mobile logo */}
           <div className="lg:hidden flex flex-col items-center gap-2 mb-8">
-            <div className="w-14 h-14 rounded-3xl bg-[#4f46e5] flex items-center justify-center shadow-lg">
+            <div className="w-14 h-14 rounded-3xl bg-[#0D7377] flex items-center justify-center shadow-lg">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
                 <path d="M4 19l4-4m0 0l4-4m-4 4l4 4m4-8l4-4" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M12 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="white" strokeWidth="2.2" strokeLinecap="round"/>
@@ -141,7 +141,7 @@ export default function AuthPage() {
 
               {mode === 'login' && (
                 <div style={{ textAlign: 'right', marginTop: -4 }}>
-                  <button type="button" style={{ background: 'none', border: 'none', color: '#4f46e5', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: '"DM Sans", system-ui' }}>
+                  <button type="button" style={{ background: 'none', border: 'none', color: '#0D7377', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: '"DM Sans", system-ui' }}>
                     Forgot password?
                   </button>
                 </div>
@@ -157,7 +157,7 @@ export default function AuthPage() {
                   padding: '14px 0',
                   borderRadius: 12,
                   border: 'none',
-                  background: loading ? '#a5b4fc' : '#4f46e5',
+                  background: loading ? '#7EC8C8' : '#0D7377',
                   color: 'white',
                   fontFamily: '"DM Sans", system-ui',
                   fontWeight: 700,
@@ -189,7 +189,7 @@ export default function AuthPage() {
               {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
               <button
                 onClick={() => setMode(mode === 'login' ? 'register' : 'login')}
-                style={{ background: 'none', border: 'none', color: '#4f46e5', fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: '"DM Sans", system-ui' }}
+                style={{ background: 'none', border: 'none', color: '#0D7377', fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: '"DM Sans", system-ui' }}
               >
                 {mode === 'login' ? 'Sign up' : 'Log in'}
               </button>
@@ -224,10 +224,10 @@ function InputField({ icon, type, placeholder, value, onChange, required, minLen
         padding: '0 14px',
         height: 50,
         borderRadius: 12,
-        border: `1.5px solid ${focused ? '#4f46e5' : '#DADDE1'}`,
+        border: `1.5px solid ${focused ? '#0D7377' : '#DADDE1'}`,
         background: focused ? '#fff' : '#F7F8FA',
         transition: 'border-color 0.15s ease, background 0.15s ease',
-        boxShadow: focused ? '0 0 0 3px rgba(79,70,229,0.12)' : 'none',
+        boxShadow: focused ? '0 0 0 3px rgba(13,115,119,0.12)' : 'none',
       }}
     >
       <span style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>{icon}</span>
