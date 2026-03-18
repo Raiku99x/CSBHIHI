@@ -136,7 +136,7 @@ export default function ChatPage() {
           {users.slice(0, 2).map((u, i) => (
             <img
               key={u.id}
-              src={u.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${u.display_name}`}
+              src={u.avatar_url || dicebearUrl(u.display_name)}
               style={{
                 width: 30, height: 30, borderRadius: '50%', objectFit: 'cover',
                 position: 'absolute', border: '2px solid white',
@@ -252,7 +252,7 @@ export default function ChatPage() {
                       onMouseEnter={e => e.currentTarget.style.background = '#F0F2F5'}
                       onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                     >
-                      <img src={u.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${u.display_name}`}
+                      <img src={u.avatar_url || dicebearUrl(u.display_name)}
                         style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover' }} alt="" />
                       <span style={{ fontWeight: 600 }}>{u.display_name}</span>
                     </button>
@@ -392,7 +392,7 @@ function MessageBubble({ msg, currentUserId, onDelete }) {
         <div style={{ width: 28, flexShrink: 0 }}>
           {msg.isLast && (
             <img
-              src={msg.sender?.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${msg.sender?.display_name || 'U'}`}
+              src={msg.sender?.avatar_url || dicebearUrl(msg.sender?.display_name)}
               style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', display: 'block' }}
               alt=""
             />
