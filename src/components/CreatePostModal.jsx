@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -18,10 +18,23 @@ import toast from 'react-hot-toast'
 const MAX_PHOTOS = 20
 const MAX_FILES = 10
 
-export default function CreatePostModal({ onClose, onCreated, subjects, defaultType = 'status' }) {
+export default function CreatePostModal({
+  onClose,
+  onCreated,
+  subjects,
+  defaultType = 'status',
+  defaultSubType = 'status',
+  autoOpenPhoto = false,
+  autoOpenFile = false,
+}) {
   const { user, profile } = useAuth()
   const [form, setForm] = useState({
-    caption: '', subject_id: '', post_type: defaultType, sub_type: 'status', due_date: '', announcement_type: ''
+    caption: '',
+    subject_id: '',
+    post_type: defaultType,
+    sub_type: defaultSubType,
+    due_date: '',
+    announcement_type: '',
   })
   const [photoFiles, setPhotoFiles] = useState([])
   const [photoPreviews, setPhotoPreviews] = useState([])
@@ -31,6 +44,18 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
   const photoRef = useRef()
   const fileRef = useRef()
   const uploadCounter = useRef(0)
+
+  // Auto-open the correct picker on mount
+  useEffect(() => {
+    if (autoOpenPhoto) {
+      const t = setTimeout(() => photoRef.current?.click(), 150)
+      return () => clearTimeout(t)
+    }
+    if (autoOpenFile) {
+      const t = setTimeout(() => fileRef.current?.click(), 150)
+      return () => clearTimeout(t)
+    }
+  }, [autoOpenPhoto, autoOpenFile])
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
   const isAnnouncement = form.post_type === 'announcement'
@@ -76,8 +101,8 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
 
   async function handleSubmit(e) {
     e.preventDefault()
-    if (!form.caption.trim() && photoFiles.length === 0) {
-      toast.error('Add a caption or photo')
+    if (!form.caption.trim() && photoFiles.length === 0 && attachFiles.length === 0) {
+      toast.error('Add a caption, photo, or file')
       return
     }
     if (isDeadline && !form.due_date) {
@@ -141,7 +166,12 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
         }
       }
 
-      toast.success(isDeadline ? '📅 Deadline posted!' : isAnnouncement ? '🔔 Reminder posted!' : form.sub_type === 'material' ? '📁 Material shared!' : 'Posted!')
+      toast.success(
+        isDeadline ? '📅 Deadline posted!'
+        : isAnnouncement ? '🔔 Reminder posted!'
+        : form.sub_type === 'material' ? '📁 Material shared!'
+        : 'Posted!'
+      )
       onCreated(post)
       onClose()
     } catch (err) {
@@ -151,7 +181,6 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
       setUploadProgress('')
     }
   }
-
 
   return (
     <div
@@ -346,7 +375,6 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
                 width: '100%', border: 'none', outline: 'none', resize: 'none',
                 fontFamily: '"Instrument Sans", system-ui', fontSize: 18, color: '#050505',
                 background: 'transparent', lineHeight: 1.5,
-                placeholder: { color: '#65676B' },
               }}
             />
 
@@ -465,7 +493,7 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
           </div>
 
           {/* Hidden inputs */}
-          <input ref={photoRef} type="file" accept="image/*" multiple className="hidden" onChange={handlePhoto} style={{ display: 'none' }} />
+          <input ref={photoRef} type="file" accept="image/*,video/*" multiple style={{ display: 'none' }} onChange={handlePhoto} />
           <input ref={fileRef} type="file" multiple style={{ display: 'none' }} onChange={handleFile} />
 
           {/* Add to post bar */}
@@ -481,19 +509,17 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
             <div style={{ display: 'flex', gap: 4 }}>
               <MediaBtn
                 icon={<Image size={22} color="#45BD62" />}
-                title="Photos"
+                title="Photos/Videos"
                 onClick={() => photoRef.current.click()}
                 badge={photoFiles.length > 0 ? photoFiles.length : null}
               />
-              {/* Files only available for Material or Announcement sub-types */}
-              {(form.sub_type === 'material' || isAnnouncement) && (
-                <MediaBtn
-                  icon={<Paperclip size={22} color="#0D7377" />}
-                  title="Files"
-                  onClick={() => fileRef.current.click()}
-                  badge={attachFiles.length > 0 ? attachFiles.length : null}
-                />
-              )}
+              {/* Files always visible */}
+              <MediaBtn
+                icon={<Paperclip size={22} color="#1877F2" />}
+                title="Files"
+                onClick={() => fileRef.current.click()}
+                badge={attachFiles.length > 0 ? attachFiles.length : null}
+              />
             </div>
           </div>
 
