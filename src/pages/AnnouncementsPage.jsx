@@ -53,7 +53,7 @@ export default function AnnouncementsPage() {
 
       {/* ── Header card ── */}
       <div style={{
-        background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+        background: 'linear-gradient(135deg, #0D7377 0%, #0A5C60 100%)',
         borderRadius: 12, padding: '20px 20px 18px',
         marginBottom: 8, display: 'flex', alignItems: 'center', gap: 14,
       }}>
@@ -65,17 +65,17 @@ export default function AnnouncementsPage() {
           <Megaphone size={24} color="white" />
         </div>
         <div style={{ flex: 1 }}>
-          <p style={{ margin: 0, fontFamily: '"Syne", system-ui', fontWeight: 800, fontSize: 20, color: 'white' }}>
+          <p style={{ margin: 0, fontFamily: '"Bricolage Grotesque", system-ui', fontWeight: 800, fontSize: 20, color: 'white' }}>
             Announcements
           </p>
-          <p style={{ margin: '2px 0 0', fontFamily: '"DM Sans", system-ui', fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>
+          <p style={{ margin: '2px 0 0', fontFamily: '"Instrument Sans", system-ui', fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>
             From your enrolled subjects
           </p>
         </div>
         {!loading && (
           <span style={{
             background: 'rgba(255,255,255,0.2)', color: 'white',
-            fontFamily: '"DM Sans", system-ui', fontWeight: 700, fontSize: 13,
+            fontFamily: '"Instrument Sans", system-ui', fontWeight: 700, fontSize: 13,
             padding: '4px 12px', borderRadius: 20,
           }}>
             {filtered.length}
@@ -95,8 +95,8 @@ export default function AnnouncementsPage() {
             onClick={() => setFilter(f.key)}
             style={{
               flex: 1, padding: '8px 0', borderRadius: 8, border: 'none', cursor: 'pointer',
-              fontFamily: '"DM Sans", system-ui', fontWeight: 600, fontSize: 14,
-              background: filter === f.key ? '#4f46e5' : 'transparent',
+              fontFamily: '"Instrument Sans", system-ui', fontWeight: 600, fontSize: 14,
+              background: filter === f.key ? '#0D7377' : 'transparent',
               color: filter === f.key ? 'white' : '#65676B',
               transition: 'all 0.15s',
             }}
@@ -135,10 +135,10 @@ function EmptyState({ emoji, title, subtitle }) {
       padding: '48px 24px', textAlign: 'center',
     }}>
       <div style={{ fontSize: 44, marginBottom: 10 }}>{emoji}</div>
-      <p style={{ margin: '0 0 6px', fontFamily: '"Syne", system-ui', fontWeight: 700, fontSize: 17, color: '#050505' }}>
+      <p style={{ margin: '0 0 6px', fontFamily: '"Bricolage Grotesque", system-ui', fontWeight: 700, fontSize: 17, color: '#050505' }}>
         {title}
       </p>
-      <p style={{ margin: 0, fontFamily: '"DM Sans", system-ui', fontSize: 14, color: '#65676B' }}>
+      <p style={{ margin: 0, fontFamily: '"Instrument Sans", system-ui', fontSize: 14, color: '#65676B' }}>
         {subtitle}
       </p>
     </div>
