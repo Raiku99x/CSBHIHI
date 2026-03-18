@@ -58,7 +58,7 @@ export default function Layout({ children }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{
               width: 36, height: 36, borderRadius: 10,
-              background: '#4f46e5',
+              background: '#0D7377',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               flexShrink: 0,
             }}>
@@ -81,13 +81,13 @@ export default function Layout({ children }) {
                 onClick={() => { setShowNotifs(!showNotifs); setShowUserMenu(false) }}
                 style={{
                   width: 40, height: 40, borderRadius: '50%',
-                  background: showNotifs ? '#E7F3FF' : '#F0F2F5',
+                  background: showNotifs ? '#E0F2F2' : '#F0F2F5',
                   border: 'none', cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   position: 'relative', transition: 'background 0.15s',
                 }}
               >
-                <Bell size={20} color={showNotifs ? '#4f46e5' : '#65676B'} />
+                <Bell size={20} color={showNotifs ? '#0D7377' : '#65676B'} />
                 {unreadCount > 0 && (
                   <span style={{
                     position: 'absolute', top: 4, right: 4,
@@ -122,7 +122,7 @@ export default function Layout({ children }) {
                   display: 'flex', alignItems: 'center', gap: 8,
                   padding: '4px 8px 4px 4px',
                   borderRadius: 20, border: 'none', cursor: 'pointer',
-                  background: showUserMenu ? '#E7F3FF' : 'transparent',
+                  background: showUserMenu ? '#E0F2F2' : 'transparent',
                   transition: 'background 0.15s',
                 }}
               >
@@ -205,18 +205,18 @@ export default function Layout({ children }) {
                   display: 'flex', flexDirection: 'column',
                   alignItems: 'center', justifyContent: 'center',
                   gap: 3, padding: '6px 0',
-                  borderTop: isActive ? '2px solid #4f46e5' : '2px solid transparent',
+                  borderTop: isActive ? '2px solid #0D7377' : '2px solid transparent',
                   marginTop: -1,
                   transition: 'all 0.15s ease',
                 }}>
                   <Icon
                     size={22}
-                    color={isActive ? '#4f46e5' : '#65676B'}
+                    color={isActive ? '#0D7377' : '#65676B'}
                     strokeWidth={isActive ? 2.5 : 2}
                   />
                   <span style={{
                     fontSize: 10, fontWeight: isActive ? 700 : 500,
-                    color: isActive ? '#4f46e5' : '#65676B',
+                    color: isActive ? '#0D7377' : '#65676B',
                     fontFamily: '"DM Sans", system-ui',
                     letterSpacing: 0.1,
                   }}>
@@ -280,7 +280,7 @@ function NotifPanel({ notifications, unreadCount, markAllRead, markRead, onClose
             onClick={markAllRead}
             style={{
               background: 'none', border: 'none', cursor: 'pointer',
-              color: '#4f46e5', fontSize: 12, fontWeight: 600,
+              color: '#0D7377', fontSize: 12, fontWeight: 600,
               fontFamily: '"DM Sans", system-ui',
               display: 'flex', alignItems: 'center', gap: 4,
             }}
@@ -321,7 +321,7 @@ function NotifItem({ notif, onRead, onClose, navigate }) {
       style={{
         width: '100%', display: 'flex', alignItems: 'flex-start', gap: 12,
         padding: '10px 16px', border: 'none', cursor: 'pointer', textAlign: 'left',
-        background: hovered ? '#F7F8FA' : notif.is_read ? 'white' : '#EEF2FF',
+        background: hovered ? '#F7F8FA' : notif.is_read ? 'white' : '#E6F4F4',
         transition: 'background 0.12s',
       }}
     >
@@ -335,7 +335,7 @@ function NotifItem({ notif, onRead, onClose, navigate }) {
         </p>
       </div>
       {!notif.is_read && (
-        <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#4f46e5', flexShrink: 0, marginTop: 6 }} />
+        <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#0D7377', flexShrink: 0, marginTop: 6 }} />
       )}
     </button>
   )
