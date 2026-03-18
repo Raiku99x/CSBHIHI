@@ -1,5 +1,20 @@
 import { useState, useEffect, useRef } from 'react'
 import { formatDistanceToNow, format } from 'date-fns'
+
+const AVATAR_HEX = ['0D7377','0A5C60','3D5166','4A6070','2D6A4F','3A6EA5','2E5F8A','5C4A7A','6B5B8A','7A5C42','8A6A50','8A4A4B','7A3D3E','647A3A','596B32','1A7A80','156870','3A4F70','2E4260','7A3A35','6A2E2A','156A6E','0F5F63','4A3A7A','3E3068']
+const AVATAR_BG  = ['#E0F0F0','#D6ECED','#DDE4EA','#E2E8EE','#D8EDE6','#DCEAF5','#D8E8F4','#E4E0EB','#E0DCE8','#EDE4D8','#EBE0D4','#EDDDDE','#EBD9DA','#E3E8D4','#DDE4CC','#D8ECED','#D4E8EA','#D8DDE8','#D6DBE6','#ECDBD8','#E8D8D4','#D8EDE8','#DAEfEB','#DDD8EC','#D8D4E8']
+const AVATAR_TXT = ['#074749','#065457','#2C3E50','#2C3E50','#1B4332','#1A3A5C','#1A3A5C','#3D2B5E','#3D2B5E','#4A3728','#4A3728','#5C2B2C','#5C2B2C','#3A4A20','#3A4A20','#0A4A4E','#0A4A4E','#1A2A4A','#1A2A4A','#4A1E1A','#4A1E1A','#0A3D3F','#074749','#2A1E5C','#2A1E5C']
+
+function getAvatarIdx(name = '') {
+  const c = (name.trim()[0] || 'A').toUpperCase()
+  return Math.max(0, c.charCodeAt(0) - 65) % AVATAR_HEX.length
+}
+function avatarHex(name)  { return AVATAR_HEX[getAvatarIdx(name)] }
+function avatarBg(name)   { return AVATAR_BG[getAvatarIdx(name)] }
+function avatarText(name) { return AVATAR_TXT[getAvatarIdx(name)] }
+function dicebearUrl(name = '') {
+  return `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name || 'U')}&backgroundColor=${avatarHex(name)}&textColor=ffffff`
+}
 import {
   FileText, Download, Calendar, BookOpen, Megaphone,
   Heart, MessageCircle, Share2, X, ChevronLeft, ChevronRight,
@@ -255,7 +270,7 @@ export default function PostCard({ post, currentUserId }) {
         {/* ── Post header ── */}
         <div style={{ padding: '12px 16px 0', display: 'flex', alignItems: 'center', gap: 10 }}>
           <img
-            src={post.profiles?.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${post.profiles?.display_name || 'U'}&backgroundColor=4f46e5&textColor=ffffff`}
+            src={post.profiles?.avatar_url || dicebearUrl(post.profiles?.display_name)}
             alt=""
             style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, background: '#E4E6EB' }}
           />
