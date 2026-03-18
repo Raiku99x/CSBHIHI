@@ -3,32 +3,32 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import PostCard from '../components/PostCard'
 import { PostSkeleton } from '../components/Skeletons'
-import { Megaphone, Filter } from 'lucide-react'
+import { Megaphone } from 'lucide-react'
+
+const FILTERS = [
+  { key: 'all', label: 'All' },
+  { key: 'upcoming', label: 'Upcoming' },
+  { key: 'past', label: 'Past Due' },
+]
 
 export default function AnnouncementsPage() {
   const { user } = useAuth()
   const [announcements, setAnnouncements] = useState([])
   const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState('all') // all | upcoming | past
+  const [filter, setFilter] = useState('all')
 
   useEffect(() => {
     async function fetch() {
-      // Get enrolled subject IDs
       const { data: enrolled } = await supabase
-        .from('user_subjects')
-        .select('subject_id')
-        .eq('user_id', user.id)
-
+        .from('user_subjects').select('subject_id').eq('user_id', user.id)
       const subjectIds = enrolled?.map(e => e.subject_id) || []
 
       let query = supabase
-        .from('posts')
-        .select('*, profiles(*), subjects(*)')
+        .from('posts').select('*, profiles(*), subjects(*)')
         .eq('post_type', 'announcement')
         .order('created_at', { ascending: false })
 
       if (subjectIds.length > 0) {
-        // Show announcements from enrolled subjects OR general (no subject)
         query = query.or(`subject_id.in.(${subjectIds.join(',')}),subject_id.is.null`)
       } else {
         query = query.is('subject_id', null)
@@ -43,68 +43,104 @@ export default function AnnouncementsPage() {
 
   const now = new Date()
   const filtered = announcements.filter(a => {
-    if (filter === 'all') return true
     if (filter === 'upcoming') return !a.due_date || new Date(a.due_date) >= now
     if (filter === 'past') return a.due_date && new Date(a.due_date) < now
     return true
   })
 
   return (
-    <div className="py-4 space-y-4">
-      {/* Header */}
-      <div className="card p-4 bg-gradient-to-r from-brand-600 to-violet-600 text-white border-0">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-            <Megaphone size={20} />
-          </div>
-          <div>
-            <h1 className="font-display font-bold text-lg">Announcements</h1>
-            <p className="text-white/70 text-sm">From your enrolled subjects</p>
-          </div>
-          {!loading && (
-            <span className="ml-auto bg-white/20 text-white text-xs font-bold px-2.5 py-1 rounded-full">
-              {filtered.length}
-            </span>
-          )}
+    <div style={{ paddingTop: 12 }}>
+
+      {/* ── Header card ── */}
+      <div style={{
+        background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+        borderRadius: 12, padding: '20px 20px 18px',
+        marginBottom: 8, display: 'flex', alignItems: 'center', gap: 14,
+      }}>
+        <div style={{
+          width: 48, height: 48, borderRadius: 14,
+          background: 'rgba(255,255,255,0.2)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+        }}>
+          <Megaphone size={24} color="white" />
         </div>
+        <div style={{ flex: 1 }}>
+          <p style={{ margin: 0, fontFamily: '"Syne", system-ui', fontWeight: 800, fontSize: 20, color: 'white' }}>
+            Announcements
+          </p>
+          <p style={{ margin: '2px 0 0', fontFamily: '"DM Sans", system-ui', fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>
+            From your enrolled subjects
+          </p>
+        </div>
+        {!loading && (
+          <span style={{
+            background: 'rgba(255,255,255,0.2)', color: 'white',
+            fontFamily: '"DM Sans", system-ui', fontWeight: 700, fontSize: 13,
+            padding: '4px 12px', borderRadius: 20,
+          }}>
+            {filtered.length}
+          </span>
+        )}
       </div>
 
-      {/* Filter tabs */}
-      <div className="flex p-1 bg-white rounded-xl border border-slate-100 shadow-sm">
-        {[
-          { key: 'all', label: 'All' },
-          { key: 'upcoming', label: 'Upcoming' },
-          { key: 'past', label: 'Past Due' },
-        ].map(f => (
+      {/* ── Filter tabs ── */}
+      <div style={{
+        background: 'white', borderRadius: 12,
+        border: '1px solid #DADDE1', marginBottom: 8,
+        display: 'flex', padding: 6, gap: 4,
+      }}>
+        {FILTERS.map(f => (
           <button
             key={f.key}
             onClick={() => setFilter(f.key)}
-            className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
-              filter === f.key ? 'bg-brand-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700'
-            }`}
+            style={{
+              flex: 1, padding: '8px 0', borderRadius: 8, border: 'none', cursor: 'pointer',
+              fontFamily: '"DM Sans", system-ui', fontWeight: 600, fontSize: 14,
+              background: filter === f.key ? '#4f46e5' : 'transparent',
+              color: filter === f.key ? 'white' : '#65676B',
+              transition: 'all 0.15s',
+            }}
           >
             {f.label}
           </button>
         ))}
       </div>
 
+      {/* ── Content ── */}
       {loading ? (
-        Array.from({ length: 2 }).map((_, i) => <PostSkeleton key={i} />)
-      ) : filtered.length === 0 ? (
-        <div className="card p-12 text-center">
-          <div className="text-4xl mb-3">📭</div>
-          <p className="font-semibold text-slate-700">No announcements</p>
-          <p className="text-sm text-slate-400 mt-1">
-            {announcements.length === 0
-              ? 'Enroll in subjects to see their announcements'
-              : 'No announcements match this filter'}
-          </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {[0, 1].map(i => <PostSkeleton key={i} />)}
         </div>
+      ) : filtered.length === 0 ? (
+        <EmptyState
+          emoji="📭"
+          title="No announcements"
+          subtitle={announcements.length === 0
+            ? 'Enroll in subjects to see their announcements'
+            : 'No announcements match this filter'}
+        />
       ) : (
-        filtered.map(post => (
-          <PostCard key={post.id} post={post} currentUserId={user?.id} />
-        ))
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {filtered.map(post => <PostCard key={post.id} post={post} currentUserId={user?.id} />)}
+        </div>
       )}
+    </div>
+  )
+}
+
+function EmptyState({ emoji, title, subtitle }) {
+  return (
+    <div style={{
+      background: 'white', borderRadius: 12, border: '1px solid #DADDE1',
+      padding: '48px 24px', textAlign: 'center',
+    }}>
+      <div style={{ fontSize: 44, marginBottom: 10 }}>{emoji}</div>
+      <p style={{ margin: '0 0 6px', fontFamily: '"Syne", system-ui', fontWeight: 700, fontSize: 17, color: '#050505' }}>
+        {title}
+      </p>
+      <p style={{ margin: 0, fontFamily: '"DM Sans", system-ui', fontSize: 14, color: '#65676B' }}>
+        {subtitle}
+      </p>
     </div>
   )
 }
