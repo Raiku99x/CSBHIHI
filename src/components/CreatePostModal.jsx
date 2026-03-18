@@ -1,6 +1,14 @@
 import { useState, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
+
+const AVATAR_HEX = ['0D7377','0A5C60','3D5166','4A6070','2D6A4F','3A6EA5','2E5F8A','5C4A7A','6B5B8A','7A5C42','8A6A50','8A4A4B','7A3D3E','647A3A','596B32','1A7A80','156870','3A4F70','2E4260','7A3A35','6A2E2A','156A6E','0F5F63','4A3A7A','3E3068']
+function dicebearUrl(name = '') {
+  const c = (name.trim()[0] || 'A').toUpperCase()
+  const hex = AVATAR_HEX[Math.max(0, c.charCodeAt(0) - 65) % AVATAR_HEX.length]
+  return `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name || 'U')}&backgroundColor=${hex}&textColor=ffffff`
+}
+
 import {
   X, Image, Paperclip, ChevronDown, Loader2,
   Megaphone, FileText, Plus, Globe
@@ -188,7 +196,7 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
             {/* Author row */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
               <img
-                src={profile?.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=U`}
+                src={profile?.avatar_url || dicebearUrl(profile?.display_name)}
                 style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', background: '#E4E6EB' }}
                 alt=""
               />
