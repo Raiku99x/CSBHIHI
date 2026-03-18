@@ -67,7 +67,7 @@ export default function Layout({ children }) {
                 <path d="M12 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="white" strokeWidth="2.2" strokeLinecap="round"/>
               </svg>
             </div>
-            <span style={{ fontFamily: '"Syne", system-ui', fontWeight: 800, fontSize: 20, color: '#1c1e21', letterSpacing: '-0.3px' }}>
+            <span style={{ fontFamily: '"Bricolage Grotesque", system-ui', fontWeight: 800, fontSize: 20, color: '#1c1e21', letterSpacing: '-0.3px' }}>
               EduBoard
             </span>
           </div>
@@ -93,7 +93,7 @@ export default function Layout({ children }) {
                     position: 'absolute', top: 4, right: 4,
                     minWidth: 16, height: 16, borderRadius: 8,
                     background: '#E41E3F', color: 'white',
-                    fontSize: 10, fontWeight: 700, fontFamily: '"DM Sans", system-ui',
+                    fontSize: 10, fontWeight: 700, fontFamily: '"Instrument Sans", system-ui',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     padding: '0 3px', border: '2px solid white',
                   }}>
@@ -132,7 +132,7 @@ export default function Layout({ children }) {
                   style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', background: '#E4E6EB' }}
                 />
                 <span style={{
-                  fontFamily: '"DM Sans", system-ui', fontWeight: 600, fontSize: 14,
+                  fontFamily: '"Instrument Sans", system-ui', fontWeight: 600, fontSize: 14,
                   color: '#1c1e21', maxWidth: 96, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                   display: 'none',
                 }} className="sm-show">
@@ -158,10 +158,10 @@ export default function Layout({ children }) {
                       alt=""
                     />
                     <div style={{ minWidth: 0 }}>
-                      <p style={{ margin: 0, fontWeight: 700, fontSize: 14, color: '#1c1e21', fontFamily: '"DM Sans", system-ui', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <p style={{ margin: 0, fontWeight: 700, fontSize: 14, color: '#1c1e21', fontFamily: '"Instrument Sans", system-ui', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {profile?.display_name}
                       </p>
-                      <p style={{ margin: 0, fontSize: 12, color: '#65676B', fontFamily: '"DM Sans", system-ui', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <p style={{ margin: 0, fontSize: 12, color: '#65676B', fontFamily: '"Instrument Sans", system-ui', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {profile?.email}
                       </p>
                     </div>
@@ -217,7 +217,7 @@ export default function Layout({ children }) {
                   <span style={{
                     fontSize: 10, fontWeight: isActive ? 700 : 500,
                     color: isActive ? '#0D7377' : '#65676B',
-                    fontFamily: '"DM Sans", system-ui',
+                    fontFamily: '"Instrument Sans", system-ui',
                     letterSpacing: 0.1,
                   }}>
                     {label}
@@ -249,7 +249,7 @@ function MenuAction({ icon, label, onClick, danger }) {
         padding: '10px 16px', border: 'none', cursor: 'pointer', textAlign: 'left',
         background: hovered ? (danger ? '#FFF5F5' : '#F7F8FA') : 'transparent',
         color: danger ? '#E41E3F' : '#1c1e21',
-        fontFamily: '"DM Sans", system-ui', fontWeight: 500, fontSize: 14,
+        fontFamily: '"Instrument Sans", system-ui', fontWeight: 500, fontSize: 14,
         transition: 'background 0.12s',
       }}
     >
@@ -272,7 +272,7 @@ function NotifPanel({ notifications, unreadCount, markAllRead, markRead, onClose
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '12px 16px', borderBottom: '1px solid #F0F2F5',
       }}>
-        <span style={{ fontFamily: '"Syne", system-ui', fontWeight: 700, fontSize: 16, color: '#1c1e21' }}>
+        <span style={{ fontFamily: '"Bricolage Grotesque", system-ui', fontWeight: 700, fontSize: 16, color: '#1c1e21' }}>
           Notifications
         </span>
         {unreadCount > 0 && (
@@ -281,7 +281,7 @@ function NotifPanel({ notifications, unreadCount, markAllRead, markRead, onClose
             style={{
               background: 'none', border: 'none', cursor: 'pointer',
               color: '#0D7377', fontSize: 12, fontWeight: 600,
-              fontFamily: '"DM Sans", system-ui',
+              fontFamily: '"Instrument Sans", system-ui',
               display: 'flex', alignItems: 'center', gap: 4,
             }}
           >
@@ -292,7 +292,7 @@ function NotifPanel({ notifications, unreadCount, markAllRead, markRead, onClose
 
       <div style={{ maxHeight: 320, overflowY: 'auto' }}>
         {notifications.length === 0 ? (
-          <div style={{ padding: '32px 16px', textAlign: 'center', color: '#65676B', fontSize: 14, fontFamily: '"DM Sans", system-ui' }}>
+          <div style={{ padding: '32px 16px', textAlign: 'center', color: '#65676B', fontSize: 14, fontFamily: '"Instrument Sans", system-ui' }}>
             No notifications yet
           </div>
         ) : notifications.map(n => (
@@ -327,10 +327,10 @@ function NotifItem({ notif, onRead, onClose, navigate }) {
     >
       <span style={{ fontSize: 22, flexShrink: 0, marginTop: 2 }}>{icons[notif.type] || '🔔'}</span>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ margin: 0, fontSize: 13, color: '#1c1e21', fontFamily: '"DM Sans", system-ui', lineHeight: 1.4 }}>
+        <p style={{ margin: 0, fontSize: 13, color: '#1c1e21', fontFamily: '"Instrument Sans", system-ui', lineHeight: 1.4 }}>
           {notif.message}
         </p>
-        <p style={{ margin: '3px 0 0', fontSize: 11, color: '#65676B', fontFamily: '"DM Sans", system-ui' }}>
+        <p style={{ margin: '3px 0 0', fontSize: 11, color: '#65676B', fontFamily: '"Instrument Sans", system-ui' }}>
           {formatDistanceToNow(new Date(notif.created_at), { addSuffix: true })}
         </p>
       </div>
