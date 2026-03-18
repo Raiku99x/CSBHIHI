@@ -21,7 +21,7 @@ const MAX_FILES = 10
 export default function CreatePostModal({ onClose, onCreated, subjects, defaultType = 'status' }) {
   const { user, profile } = useAuth()
   const [form, setForm] = useState({
-    caption: '', subject_id: '', post_type: defaultType, sub_type: 'status', due_date: ''
+    caption: '', subject_id: '', post_type: defaultType, sub_type: 'status', due_date: '', announcement_type: ''
   })
   const [photoFiles, setPhotoFiles] = useState([])
   const [photoPreviews, setPhotoPreviews] = useState([])
@@ -117,6 +117,8 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
           caption: form.caption.trim(),
           photo_url, file_url, file_name,
           post_type: form.post_type,
+          sub_type: form.sub_type || null,
+          announcement_type: isAnnouncement && form.announcement_type ? form.announcement_type : null,
           due_date: isDeadline && form.due_date ? form.due_date : null,
         })
         .select('*, profiles(*), subjects(*)')
@@ -236,8 +238,10 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
                   type="button"
                   onClick={() => {
                     set('post_type', key)
-                    set('sub_type', key === 'status' ? 'status' : 'reminder')
-                    if (key === 'status') set('due_date', '')
+                    const newSub = key === 'status' ? 'status' : 'reminder'
+                    set('sub_type', newSub)
+                    set('announcement_type', '')
+                    if (key === 'status') { set('due_date', ''); setAttachFiles([]) }
                   }}
                   style={{
                     flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
@@ -267,25 +271,25 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
             }}>
               {(isAnnouncement
                 ? [
-                    { key: 'reminder', label: '🔔 Reminder', desc: 'No due date' },
-                    { key: 'deadline', label: '📅 Deadline', desc: 'Requires due date' },
+                    { key: 'reminder', label: '🔔 Reminder' },
+                    { key: 'deadline', label: '📅 Deadline' },
                   ]
                 : [
-                    { key: 'status', label: '💬 Status', desc: 'General update' },
-                    { key: 'material', label: '📁 Material', desc: 'Learning resource' },
+                    { key: 'status', label: '💬 Status' },
+                    { key: 'material', label: '📁 Material' },
                   ]
-              ).map(({ key, label, desc }) => (
+              ).map(({ key, label }) => (
                 <button
                   key={key}
                   type="button"
                   onClick={() => {
                     set('sub_type', key)
                     if (key !== 'deadline') set('due_date', '')
+                    if (key === 'status') setAttachFiles([])
                   }}
                   style={{
-                    flex: 1, display: 'flex', flexDirection: 'column',
-                    alignItems: 'center', justifyContent: 'center',
-                    padding: '7px 6px', borderRadius: 6, border: 'none', cursor: 'pointer',
+                    flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    padding: '8px 6px', borderRadius: 6, border: 'none', cursor: 'pointer',
                     fontFamily: '"Instrument Sans", system-ui',
                     background: form.sub_type === key ? 'white' : 'transparent',
                     boxShadow: form.sub_type === key ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
@@ -293,16 +297,39 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
                   }}
                 >
                   <span style={{
-                    fontWeight: 700, fontSize: 12,
+                    fontWeight: 700, fontSize: 13,
                     color: form.sub_type === key ? '#050505' : '#65676B',
                   }}>{label}</span>
-                  <span style={{
-                    fontSize: 10, marginTop: 1,
-                    color: form.sub_type === key ? '#65676B' : '#BCC0C4',
-                  }}>{desc}</span>
                 </button>
               ))}
             </div>
+
+            {/* Announcement type selector */}
+            {isAnnouncement && (
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ fontFamily: '"Instrument Sans", system-ui', fontSize: 11, fontWeight: 700, color: '#65676B', textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', marginBottom: 6 }}>
+                  Announcement Type
+                </label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  {['Quiz','Activity','Output','Exam','Fees','Info','Learning Task'].map(type => (
+                    <button
+                      key={type}
+                      type="button"
+                      onClick={() => set('announcement_type', form.announcement_type === type ? '' : type)}
+                      style={{
+                        padding: '5px 12px', borderRadius: 20, border: 'none', cursor: 'pointer',
+                        fontFamily: '"Instrument Sans", system-ui', fontWeight: 600, fontSize: 12,
+                        background: form.announcement_type === type ? '#0D7377' : '#F0F2F5',
+                        color: form.announcement_type === type ? 'white' : '#65676B',
+                        transition: 'all 0.15s',
+                      }}
+                    >
+                      {type}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Textarea */}
             <textarea
@@ -458,12 +485,15 @@ export default function CreatePostModal({ onClose, onCreated, subjects, defaultT
                 onClick={() => photoRef.current.click()}
                 badge={photoFiles.length > 0 ? photoFiles.length : null}
               />
-              <MediaBtn
-                icon={<Paperclip size={22} color="#0D7377" />}
-                title="Files"
-                onClick={() => fileRef.current.click()}
-                badge={attachFiles.length > 0 ? attachFiles.length : null}
-              />
+              {/* Files only available for Material or Announcement sub-types */}
+              {(form.sub_type === 'material' || isAnnouncement) && (
+                <MediaBtn
+                  icon={<Paperclip size={22} color="#0D7377" />}
+                  title="Files"
+                  onClick={() => fileRef.current.click()}
+                  badge={attachFiles.length > 0 ? attachFiles.length : null}
+                />
+              )}
             </div>
           </div>
 
