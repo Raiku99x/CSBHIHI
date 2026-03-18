@@ -4,6 +4,13 @@ import { useAuth } from '../contexts/AuthContext'
 import PostCard from '../components/PostCard'
 import CreatePostModal from '../components/CreatePostModal'
 import { PostSkeleton } from '../components/Skeletons'
+
+const AVATAR_HEX = ['0D7377','0A5C60','3D5166','4A6070','2D6A4F','3A6EA5','2E5F8A','5C4A7A','6B5B8A','7A5C42','8A6A50','8A4A4B','7A3D3E','647A3A','596B32','1A7A80','156870','3A4F70','2E4260','7A3A35','6A2E2A','156A6E','0F5F63','4A3A7A','3E3068']
+function dicebearUrl(name = '') {
+  const c = (name.trim()[0] || 'A').toUpperCase()
+  const hex = AVATAR_HEX[Math.max(0, c.charCodeAt(0) - 65) % AVATAR_HEX.length]
+  return `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name || 'U')}&backgroundColor=${hex}&textColor=ffffff`
+}
 import { Image, Megaphone, Video } from 'lucide-react'
 
 export default function FeedPage() {
@@ -67,7 +74,7 @@ export default function FeedPage() {
         {/* Top row: avatar + input */}
         <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
           <img
-            src={profile?.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=U`}
+            src={profile?.avatar_url || dicebearUrl(profile?.display_name)}
             alt=""
             style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, background: '#E4E6EB' }}
           />
