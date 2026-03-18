@@ -7,11 +7,11 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'favicon.ico', 'apple-touch-icon.png'],
+      includeAssets: ['pwa-192x192.png', 'pwa-512x512.png'],
       manifest: {
-        name: 'EduBoard',
-        short_name: 'EduBoard',
-        description: 'Student Announcement Platform',
+        name: 'CSB Updates',
+        short_name: 'CSB Updates',
+        description: 'CSB Student Announcement Platform',
         theme_color: '#0D7377',
         background_color: '#F0F2F5',
         display: 'standalone',
