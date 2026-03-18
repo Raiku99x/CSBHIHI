@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -8,7 +8,8 @@
   * { box-sizing: border-box; }
   html { -webkit-tap-highlight-color: transparent; }
   body {
-    @apply bg-slate-50 text-slate-800 font-sans antialiased;
+    @apply bg-slate-50 text-slate-800 antialiased;
+    font-family: 'Instrument Sans', system-ui, sans-serif;
   }
   ::-webkit-scrollbar { width: 4px; height: 4px; }
   ::-webkit-scrollbar-track { @apply bg-transparent; }
@@ -17,8 +18,11 @@
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-600 text-white font-medium text-sm hover:bg-brand-700 active:scale-95 transition-all duration-150 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-white font-medium text-sm active:scale-95 transition-all duration-150 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed;
+    background: #0D7377;
   }
+  .btn-primary:hover { background: #0A5C60; }
+
   .btn-secondary {
     @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-slate-700 font-medium text-sm border border-slate-200 hover:bg-slate-50 active:scale-95 transition-all duration-150 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed;
   }
@@ -33,13 +37,23 @@
     box-shadow: 0 1px 3px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.05);
   }
   .input {
-    @apply w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 text-sm placeholder-slate-400 outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-400 transition-all duration-150;
+    @apply w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 text-sm placeholder-slate-400 outline-none transition-all duration-150;
+    font-family: 'Instrument Sans', system-ui, sans-serif;
+  }
+  .input:focus {
+    border-color: #0D7377;
+    box-shadow: 0 0 0 3px rgba(13,115,119,0.12);
   }
   .textarea {
-    @apply w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-800 text-sm placeholder-slate-400 outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-400 transition-all duration-150 resize-none;
+    @apply w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-800 text-sm placeholder-slate-400 outline-none transition-all duration-150 resize-none;
+    font-family: 'Instrument Sans', system-ui, sans-serif;
+  }
+  .textarea:focus {
+    border-color: #0D7377;
+    box-shadow: 0 0 0 3px rgba(13,115,119,0.12);
   }
   .badge { @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold; }
-  .badge-indigo { @apply badge bg-brand-100 text-brand-700; }
+  .badge-indigo { @apply badge; background: #E6F4F4; color: #0A5C60; }
   .badge-green  { @apply badge bg-emerald-100 text-emerald-700; }
   .badge-amber  { @apply badge bg-amber-100 text-amber-700; }
   .badge-rose   { @apply badge bg-rose-100 text-rose-700; }
