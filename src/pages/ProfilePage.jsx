@@ -1,15 +1,15 @@
 import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import { User, Camera, Loader2, ArrowLeft } from 'lucide-react'
+import { Loader2, ArrowLeft, Camera, Mail, User } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { supabase } from '../lib/supabase'
 import toast from 'react-hot-toast'
 
 export default function ProfilePage() {
-  const { user, profile, updateProfile } = useAuth()
+  const { profile, updateProfile } = useAuth()
   const navigate = useNavigate()
   const [displayName, setDisplayName] = useState(profile?.display_name || '')
   const [saving, setSaving] = useState(false)
+  const [focused, setFocused] = useState(null)
 
   async function handleSave(e) {
     e.preventDefault()
@@ -27,46 +27,150 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="py-4 space-y-4">
-      <button onClick={() => navigate(-1)} className="btn-ghost">
+    <div style={{ paddingTop: 12 }}>
+
+      {/* Back */}
+      <button
+        onClick={() => navigate(-1)}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 6,
+          background: 'none', border: 'none', cursor: 'pointer', padding: '6px 4px',
+          fontFamily: '"DM Sans", system-ui', fontWeight: 600, fontSize: 14, color: '#4f46e5',
+          marginBottom: 12,
+        }}
+      >
         <ArrowLeft size={16} /> Back
       </button>
 
-      <div className="card p-6">
-        <div className="flex flex-col items-center gap-4 mb-6">
-          <div className="relative">
-            <img
-              src={profile?.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=U`}
-              className="w-20 h-20 rounded-2xl object-cover bg-slate-100"
-              alt="avatar"
-            />
-          </div>
-          <div className="text-center">
-            <p className="font-display font-bold text-xl text-slate-800">{profile?.display_name}</p>
-            <p className="text-sm text-slate-400">{profile?.email}</p>
-          </div>
-        </div>
+      {/* Profile card */}
+      <div style={{
+        background: 'white', borderRadius: 12, border: '1px solid #DADDE1',
+        overflow: 'hidden', boxShadow: '0 1px 2px rgba(0,0,0,0.06)',
+      }}>
+        {/* Cover gradient */}
+        <div style={{
+          height: 100,
+          background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+        }} />
 
-        <form onSubmit={handleSave} className="space-y-4">
-          <div>
-            <label className="text-xs font-semibold text-slate-500 mb-1.5 block uppercase tracking-wide">Display Name</label>
-            <input
-              type="text"
-              className="input"
-              value={displayName}
-              onChange={e => setDisplayName(e.target.value)}
-              placeholder="Your display name"
-            />
+        {/* Avatar section */}
+        <div style={{ padding: '0 20px 20px', position: 'relative' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, marginBottom: 16 }}>
+            <div style={{ position: 'relative', marginTop: -44 }}>
+              <img
+                src={profile?.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=U`}
+                style={{
+                  width: 88, height: 88, borderRadius: '50%',
+                  objectFit: 'cover', border: '4px solid white',
+                  background: '#E4E6EB', display: 'block',
+                }}
+                alt="avatar"
+              />
+              <div style={{
+                position: 'absolute', bottom: 4, right: 0,
+                width: 26, height: 26, borderRadius: '50%',
+                background: '#E4E6EB', border: '2px solid white',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+              }}>
+                <Camera size={13} color="#050505" />
+              </div>
+            </div>
+            <div style={{ paddingBottom: 4 }}>
+              <p style={{ margin: 0, fontFamily: '"Syne", system-ui', fontWeight: 800, fontSize: 20, color: '#050505' }}>
+                {profile?.display_name}
+              </p>
+              <p style={{ margin: '2px 0 0', fontFamily: '"DM Sans", system-ui', fontSize: 13, color: '#65676B' }}>
+                {profile?.email}
+              </p>
+            </div>
           </div>
-          <div>
-            <label className="text-xs font-semibold text-slate-500 mb-1.5 block uppercase tracking-wide">Email</label>
-            <input type="email" className="input bg-slate-50" value={profile?.email || ''} disabled />
-          </div>
-          <button type="submit" disabled={saving} className="btn-primary w-full justify-center">
-            {saving && <Loader2 size={15} className="animate-spin" />}
-            {saving ? 'Saving…' : 'Save Changes'}
-          </button>
-        </form>
+
+          {/* Divider */}
+          <div style={{ height: 1, background: '#E4E6EB', marginBottom: 20 }} />
+
+          {/* Form */}
+          <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <FormField
+              label="Display Name"
+              icon={<User size={16} color="#65676B" />}
+              focused={focused === 'name'}
+            >
+              <input
+                type="text"
+                value={displayName}
+                onChange={e => setDisplayName(e.target.value)}
+                onFocus={() => setFocused('name')}
+                onBlur={() => setFocused(null)}
+                placeholder="Your display name"
+                style={{
+                  flex: 1, border: 'none', outline: 'none', background: 'transparent',
+                  fontFamily: '"DM Sans", system-ui', fontSize: 15, color: '#050505',
+                }}
+              />
+            </FormField>
+
+            <FormField
+              label="Email Address"
+              icon={<Mail size={16} color="#BCC0C4" />}
+              disabled
+            >
+              <input
+                type="email"
+                value={profile?.email || ''}
+                disabled
+                style={{
+                  flex: 1, border: 'none', outline: 'none', background: 'transparent',
+                  fontFamily: '"DM Sans", system-ui', fontSize: 15, color: '#BCC0C4',
+                }}
+              />
+            </FormField>
+
+            <button
+              type="submit"
+              disabled={saving}
+              style={{
+                padding: '13px 0', borderRadius: 10, border: 'none',
+                background: saving ? '#a5b4fc' : '#4f46e5',
+                color: 'white', cursor: saving ? 'not-allowed' : 'pointer',
+                fontFamily: '"DM Sans", system-ui', fontWeight: 700, fontSize: 16,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                transition: 'background 0.15s, transform 0.1s',
+              }}
+              onMouseDown={e => { if (!saving) e.currentTarget.style.transform = 'scale(0.985)' }}
+              onMouseUp={e => { e.currentTarget.style.transform = 'scale(1)' }}
+            >
+              {saving && <Loader2 size={17} style={{ animation: 'spin 0.8s linear infinite' }} />}
+              {saving ? 'Saving…' : 'Save Changes'}
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <style>{`@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }`}</style>
+    </div>
+  )
+}
+
+function FormField({ label, icon, children, focused, disabled }) {
+  return (
+    <div>
+      <label style={{
+        display: 'block', marginBottom: 6,
+        fontFamily: '"DM Sans", system-ui', fontSize: 12, fontWeight: 700,
+        color: '#65676B', textTransform: 'uppercase', letterSpacing: 0.5,
+      }}>
+        {label}
+      </label>
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 10,
+        padding: '0 14px', height: 50, borderRadius: 12,
+        border: `1.5px solid ${focused ? '#4f46e5' : '#E4E6EB'}`,
+        background: disabled ? '#F7F8FA' : focused ? 'white' : '#F7F8FA',
+        boxShadow: focused ? '0 0 0 3px rgba(79,70,229,0.12)' : 'none',
+        transition: 'all 0.15s',
+      }}>
+        {icon}
+        {children}
       </div>
     </div>
   )
