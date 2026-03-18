@@ -79,7 +79,7 @@ export default function FeedPage() {
               borderRadius: 20, padding: '0 16px',
               textAlign: 'left', cursor: 'pointer',
               fontSize: 15, color: '#65676B',
-              fontFamily: '"DM Sans", system-ui',
+              fontFamily: '"Instrument Sans", system-ui',
               transition: 'background 0.12s',
             }}
             onMouseEnter={e => e.currentTarget.style.background = '#E4E6EB'}
@@ -105,7 +105,7 @@ export default function FeedPage() {
             onClick={() => openCreate('status')}
           />
           <ComposeAction
-            icon={<Megaphone size={20} color="#4f46e5" />}
+            icon={<Megaphone size={20} color="#0D7377" />}
             label="Announce"
             onClick={() => openCreate('announcement')}
           />
@@ -151,7 +151,7 @@ function ComposeAction({ icon, label, onClick }) {
         padding: '8px 4px', border: 'none', cursor: 'pointer',
         background: hovered ? '#F0F2F5' : 'transparent',
         borderRadius: 8, transition: 'background 0.12s',
-        fontFamily: '"DM Sans", system-ui', fontWeight: 600, fontSize: 13,
+        fontFamily: '"Instrument Sans", system-ui', fontWeight: 600, fontSize: 13,
         color: '#65676B',
       }}
     >
@@ -168,18 +168,18 @@ function EmptyFeed({ onPost }) {
       padding: '48px 24px', textAlign: 'center',
     }}>
       <div style={{ fontSize: 48, marginBottom: 12 }}>📭</div>
-      <p style={{ fontFamily: '"Syne", system-ui', fontWeight: 700, fontSize: 18, color: '#050505', margin: '0 0 6px' }}>
+      <p style={{ fontFamily: '"Bricolage Grotesque", system-ui', fontWeight: 700, fontSize: 18, color: '#050505', margin: '0 0 6px' }}>
         No posts yet
       </p>
-      <p style={{ fontFamily: '"DM Sans", system-ui', fontSize: 14, color: '#65676B', margin: '0 0 20px' }}>
+      <p style={{ fontFamily: '"Instrument Sans", system-ui', fontSize: 14, color: '#65676B', margin: '0 0 20px' }}>
         Be the first to share something with the class.
       </p>
       <button
         onClick={onPost}
         style={{
           padding: '10px 24px', borderRadius: 8, border: 'none',
-          background: '#4f46e5', color: 'white', cursor: 'pointer',
-          fontFamily: '"DM Sans", system-ui', fontWeight: 700, fontSize: 14,
+          background: '#0D7377', color: 'white', cursor: 'pointer',
+          fontFamily: '"Instrument Sans", system-ui', fontWeight: 700, fontSize: 14,
         }}
       >
         Create Post
