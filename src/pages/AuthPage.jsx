@@ -48,12 +48,12 @@ export default function AuthPage() {
               </svg>
             </div>
             <span
-              style={{ fontFamily: '"Syne", system-ui, sans-serif', fontWeight: 800, fontSize: 28, letterSpacing: '-0.5px', color: '#1c1e21' }}
+              style={{ fontFamily: '"Bricolage Grotesque", system-ui, sans-serif', fontWeight: 800, fontSize: 28, letterSpacing: '-0.5px', color: '#1c1e21' }}
             >
               EduBoard
             </span>
           </div>
-          <p style={{ fontFamily: '"DM Sans", system-ui', fontSize: 26, fontWeight: 400, color: '#1c1e21', lineHeight: 1.3 }}>
+          <p style={{ fontFamily: '"Instrument Sans", system-ui', fontSize: 26, fontWeight: 400, color: '#1c1e21', lineHeight: 1.3 }}>
             Connect with your class and stay on top of everything.
           </p>
         </div>
@@ -69,7 +69,7 @@ export default function AuthPage() {
                 <path d="M12 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="white" strokeWidth="2.2" strokeLinecap="round"/>
               </svg>
             </div>
-            <span style={{ fontFamily: '"Syne", system-ui', fontWeight: 800, fontSize: 26, letterSpacing: '-0.5px', color: '#1c1e21' }}>
+            <span style={{ fontFamily: '"Bricolage Grotesque", system-ui', fontWeight: 800, fontSize: 26, letterSpacing: '-0.5px', color: '#1c1e21' }}>
               EduBoard
             </span>
           </div>
@@ -89,7 +89,7 @@ export default function AuthPage() {
                     borderRadius: 10,
                     fontSize: 14,
                     fontWeight: 600,
-                    fontFamily: '"DM Sans", system-ui',
+                    fontFamily: '"Instrument Sans", system-ui',
                     transition: 'all 0.18s ease',
                     background: mode === m ? 'white' : 'transparent',
                     color: mode === m ? '#1c1e21' : '#65676B',
@@ -141,7 +141,7 @@ export default function AuthPage() {
 
               {mode === 'login' && (
                 <div style={{ textAlign: 'right', marginTop: -4 }}>
-                  <button type="button" style={{ background: 'none', border: 'none', color: '#0D7377', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: '"DM Sans", system-ui' }}>
+                  <button type="button" style={{ background: 'none', border: 'none', color: '#0D7377', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: '"Instrument Sans", system-ui' }}>
                     Forgot password?
                   </button>
                 </div>
@@ -159,7 +159,7 @@ export default function AuthPage() {
                   border: 'none',
                   background: loading ? '#7EC8C8' : '#0D7377',
                   color: 'white',
-                  fontFamily: '"DM Sans", system-ui',
+                  fontFamily: '"Instrument Sans", system-ui',
                   fontWeight: 700,
                   fontSize: 16,
                   cursor: loading ? 'not-allowed' : 'pointer',
@@ -180,16 +180,16 @@ export default function AuthPage() {
             {/* Divider */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '20px 0' }}>
               <div style={{ flex: 1, height: 1, background: '#DADDE1' }} />
-              <span style={{ color: '#65676B', fontSize: 13, fontWeight: 500, fontFamily: '"DM Sans", system-ui' }}>or</span>
+              <span style={{ color: '#65676B', fontSize: 13, fontWeight: 500, fontFamily: '"Instrument Sans", system-ui' }}>or</span>
               <div style={{ flex: 1, height: 1, background: '#DADDE1' }} />
             </div>
 
             {/* Switch mode */}
-            <p style={{ textAlign: 'center', fontSize: 14, color: '#65676B', fontFamily: '"DM Sans", system-ui', margin: 0 }}>
+            <p style={{ textAlign: 'center', fontSize: 14, color: '#65676B', fontFamily: '"Instrument Sans", system-ui', margin: 0 }}>
               {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
               <button
                 onClick={() => setMode(mode === 'login' ? 'register' : 'login')}
-                style={{ background: 'none', border: 'none', color: '#0D7377', fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: '"DM Sans", system-ui' }}
+                style={{ background: 'none', border: 'none', color: '#0D7377', fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: '"Instrument Sans", system-ui' }}
               >
                 {mode === 'login' ? 'Sign up' : 'Log in'}
               </button>
@@ -197,7 +197,7 @@ export default function AuthPage() {
           </div>
 
           {/* Footer note */}
-          <p style={{ textAlign: 'center', fontSize: 12, color: '#65676B', marginTop: 20, fontFamily: '"DM Sans", system-ui' }}>
+          <p style={{ textAlign: 'center', fontSize: 12, color: '#65676B', marginTop: 20, fontFamily: '"Instrument Sans", system-ui' }}>
             EduBoard · Student Announcement Platform
           </p>
         </div>
@@ -247,7 +247,7 @@ function InputField({ icon, type, placeholder, value, onChange, required, minLen
           outline: 'none',
           fontSize: 15,
           color: '#1c1e21',
-          fontFamily: '"DM Sans", system-ui',
+          fontFamily: '"Instrument Sans", system-ui',
         }}
       />
       {suffix}
