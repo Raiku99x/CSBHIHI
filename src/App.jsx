@@ -19,7 +19,7 @@ function ProtectedRoute({ children }) {
           <div className="w-12 h-12 rounded-2xl bg-brand-600 flex items-center justify-center animate-pulse">
             <span className="text-white text-xl">📚</span>
           </div>
-          <p className="text-sm text-slate-400 font-medium">Loading EduBoard…</p>
+          <p className="text-sm text-slate-400 font-medium">Loading CSB Updates…</p>
         </div>
       </div>
     )
