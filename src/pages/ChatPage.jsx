@@ -148,10 +148,10 @@ export default function ChatPage() {
           ))}
         </div>
         <div>
-          <p style={{ margin: 0, fontFamily: '"DM Sans", system-ui', fontWeight: 700, fontSize: 15, color: '#050505' }}>
+          <p style={{ margin: 0, fontFamily: '"Instrument Sans", system-ui', fontWeight: 700, fontSize: 15, color: '#050505' }}>
             Class Chat
           </p>
-          <p style={{ margin: 0, fontFamily: '"DM Sans", system-ui', fontSize: 12, color: '#45BD62' }}>
+          <p style={{ margin: 0, fontFamily: '"Instrument Sans", system-ui', fontSize: 12, color: '#45BD62' }}>
             <span style={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', background: '#45BD62', marginRight: 4 }} />
             {users.length + 1} members · Live
           </p>
@@ -167,12 +167,12 @@ export default function ChatPage() {
       }}>
         {loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flex: 1 }}>
-            <Loader2 size={28} color="#4f46e5" style={{ animation: 'spin 0.8s linear infinite' }} />
+            <Loader2 size={28} color="#0D7377" style={{ animation: 'spin 0.8s linear infinite' }} />
           </div>
         ) : grouped.length === 0 ? (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
             <div style={{ fontSize: 48 }}>💬</div>
-            <p style={{ fontFamily: '"DM Sans", system-ui', color: '#65676B', fontSize: 14, margin: 0 }}>
+            <p style={{ fontFamily: '"Instrument Sans", system-ui', color: '#65676B', fontSize: 14, margin: 0 }}>
               No messages yet — say hello!
             </p>
           </div>
@@ -195,16 +195,16 @@ export default function ChatPage() {
           <div style={{
             display: 'flex', alignItems: 'center', gap: 8,
             padding: '6px 12px', borderRadius: 8, marginBottom: 8,
-            background: isWhisper ? '#EEF2FF' : '#F0F2F5',
-            border: `1px solid ${isWhisper ? '#a5b4fc' : '#DADDE1'}`,
+            background: isWhisper ? '#E6F4F4' : '#F0F2F5',
+            border: `1px solid ${isWhisper ? '#7EC8C8' : '#DADDE1'}`,
           }}>
-            {isWhisper ? <Lock size={12} color="#4f46e5" /> : <AtSign size={12} color="#65676B" />}
-            <span style={{ fontFamily: '"DM Sans", system-ui', fontSize: 12, fontWeight: 600, color: isWhisper ? '#4f46e5' : '#050505', flex: 1 }}>
+            {isWhisper ? <Lock size={12} color="#0D7377" /> : <AtSign size={12} color="#65676B" />}
+            <span style={{ fontFamily: '"Instrument Sans", system-ui', fontSize: 12, fontWeight: 600, color: isWhisper ? '#0D7377' : '#050505', flex: 1 }}>
               {isWhisper ? `Whispering to @${tagUser.display_name}` : `Tagging @${tagUser.display_name}`}
             </span>
             {!isWhisper && (
               <button onClick={() => setTagPublic(p => !p)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#65676B', fontSize: 11, fontFamily: '"DM Sans", system-ui', fontWeight: 600 }}>
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#65676B', fontSize: 11, fontFamily: '"Instrument Sans", system-ui', fontWeight: 600 }}>
                 {tagPublic ? 'Public' : 'Private'}
               </button>
             )}
@@ -236,7 +236,7 @@ export default function ChatPage() {
                   overflow: 'hidden', zIndex: 50,
                   animation: 'slideUp 0.18s ease',
                 }}>
-                  <p style={{ margin: 0, padding: '10px 14px 6px', fontFamily: '"DM Sans", system-ui', fontSize: 11, fontWeight: 700, color: '#65676B', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                  <p style={{ margin: 0, padding: '10px 14px 6px', fontFamily: '"Instrument Sans", system-ui', fontSize: 11, fontWeight: 700, color: '#65676B', textTransform: 'uppercase', letterSpacing: 0.5 }}>
                     Tag someone
                   </p>
                   {users.map(u => (
@@ -246,7 +246,7 @@ export default function ChatPage() {
                         width: '100%', display: 'flex', alignItems: 'center', gap: 10,
                         padding: '8px 14px', border: 'none', cursor: 'pointer',
                         background: 'transparent', textAlign: 'left',
-                        fontFamily: '"DM Sans", system-ui', fontSize: 14, color: '#050505',
+                        fontFamily: '"Instrument Sans", system-ui', fontSize: 14, color: '#050505',
                         transition: 'background 0.1s',
                       }}
                       onMouseEnter={e => e.currentTarget.style.background = '#F0F2F5'}
@@ -266,7 +266,7 @@ export default function ChatPage() {
               active={isWhisper}
               onClick={() => { setIsWhisper(w => !w); if (!isWhisper && tagUser) {} }}
               title="Send whisper"
-              color={isWhisper ? '#4f46e5' : undefined}
+              color={isWhisper ? '#0D7377' : undefined}
             >
               <Lock size={20} />
             </IconBtn>
@@ -276,7 +276,7 @@ export default function ChatPage() {
           <div style={{
             flex: 1, display: 'flex', alignItems: 'flex-end',
             background: '#F0F2F5', borderRadius: 22,
-            border: `1.5px solid ${isWhisper ? '#a5b4fc' : 'transparent'}`,
+            border: `1.5px solid ${isWhisper ? '#7EC8C8' : 'transparent'}`,
             padding: '8px 14px', gap: 8,
             transition: 'border-color 0.15s',
           }}>
@@ -293,7 +293,7 @@ export default function ChatPage() {
               placeholder={isWhisper ? '🔒 Send a whisper…' : 'Message the class…'}
               style={{
                 flex: 1, border: 'none', background: 'transparent', outline: 'none',
-                fontFamily: '"DM Sans", system-ui', fontSize: 15, color: '#050505',
+                fontFamily: '"Instrument Sans", system-ui', fontSize: 15, color: '#050505',
                 resize: 'none', lineHeight: 1.4, maxHeight: 100, overflow: 'hidden',
               }}
             />
@@ -305,7 +305,7 @@ export default function ChatPage() {
             disabled={sending || !text.trim()}
             style={{
               width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
-              background: text.trim() ? (isWhisper ? '#4f46e5' : '#0084FF') : '#E4E6EB',
+              background: text.trim() ? (isWhisper ? '#0D7377' : '#0084FF') : '#E4E6EB',
               border: 'none', cursor: text.trim() ? 'pointer' : 'default',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               transition: 'background 0.15s, transform 0.1s',
@@ -340,9 +340,9 @@ function IconBtn({ onClick, active, children, title, color }) {
       onMouseLeave={() => setHovered(false)}
       style={{
         width: 36, height: 36, borderRadius: '50%', border: 'none', cursor: 'pointer',
-        background: active ? '#EEF2FF' : hovered ? '#F0F2F5' : 'transparent',
+        background: active ? '#E6F4F4' : hovered ? '#F0F2F5' : 'transparent',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        color: active ? (color || '#4f46e5') : '#65676B',
+        color: active ? (color || '#0D7377') : '#65676B',
         transition: 'background 0.12s, color 0.12s',
       }}
     >
@@ -360,7 +360,7 @@ function MessageBubble({ msg, currentUserId, onDelete }) {
     return (
       <div style={{ display: 'flex', justifyContent: isOwn ? 'flex-end' : 'flex-start', padding: '1px 0' }}>
         <span style={{
-          fontFamily: '"DM Sans", system-ui', fontSize: 12, color: '#65676B', fontStyle: 'italic',
+          fontFamily: '"Instrument Sans", system-ui', fontSize: 12, color: '#65676B', fontStyle: 'italic',
           background: 'rgba(255,255,255,0.7)', padding: '6px 14px', borderRadius: 18,
         }}>
           {isOwn ? 'You' : msg.sender?.display_name} deleted a message
@@ -370,10 +370,10 @@ function MessageBubble({ msg, currentUserId, onDelete }) {
   }
 
   // Bubble colors
-  const ownBg = isWhisper ? '#4f46e5' : '#0084FF'
-  const otherBg = isWhisper ? '#EEF2FF' : 'white'
+  const ownBg = isWhisper ? '#0D7377' : '#0084FF'
+  const otherBg = isWhisper ? '#E6F4F4' : 'white'
   const ownText = 'white'
-  const otherText = isWhisper ? '#4f46e5' : '#050505'
+  const otherText = isWhisper ? '#0D7377' : '#050505'
 
   return (
     <div
@@ -403,7 +403,7 @@ function MessageBubble({ msg, currentUserId, onDelete }) {
       <div style={{ maxWidth: '72%', display: 'flex', flexDirection: 'column', alignItems: isOwn ? 'flex-end' : 'flex-start', gap: 2 }}>
         {/* Name label — first message in group from others */}
         {!isOwn && msg.isFirst && (
-          <span style={{ fontFamily: '"DM Sans", system-ui', fontSize: 11, fontWeight: 600, color: '#65676B', marginLeft: 12 }}>
+          <span style={{ fontFamily: '"Instrument Sans", system-ui', fontSize: 11, fontWeight: 600, color: '#65676B', marginLeft: 12 }}>
             {msg.sender?.display_name}
           </span>
         )}
@@ -422,16 +422,16 @@ function MessageBubble({ msg, currentUserId, onDelete }) {
           }}>
             {isWhisper && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4, opacity: 0.75 }}>
-                <Lock size={9} color={isOwn ? 'white' : '#4f46e5'} />
-                <span style={{ fontFamily: '"DM Sans", system-ui', fontSize: 10, fontWeight: 700, color: isOwn ? 'white' : '#4f46e5', textTransform: 'uppercase', letterSpacing: 0.5 }}>Whisper</span>
+                <Lock size={9} color={isOwn ? 'white' : '#0D7377'} />
+                <span style={{ fontFamily: '"Instrument Sans", system-ui', fontSize: 10, fontWeight: 700, color: isOwn ? 'white' : '#0D7377', textTransform: 'uppercase', letterSpacing: 0.5 }}>Whisper</span>
               </div>
             )}
             {msg.tag_user_id && (
-              <span style={{ fontFamily: '"DM Sans", system-ui', fontSize: 13, fontWeight: 700, color: isOwn ? 'rgba(255,255,255,0.85)' : '#4f46e5', marginRight: 4 }}>
+              <span style={{ fontFamily: '"Instrument Sans", system-ui', fontSize: 13, fontWeight: 700, color: isOwn ? 'rgba(255,255,255,0.85)' : '#0D7377', marginRight: 4 }}>
                 @{msg.tagged?.display_name}
               </span>
             )}
-            <span style={{ fontFamily: '"DM Sans", system-ui', fontSize: 15, lineHeight: 1.4, wordBreak: 'break-word' }}>
+            <span style={{ fontFamily: '"Instrument Sans", system-ui', fontSize: 15, lineHeight: 1.4, wordBreak: 'break-word' }}>
               {msg.content}
             </span>
           </div>
@@ -456,7 +456,7 @@ function MessageBubble({ msg, currentUserId, onDelete }) {
         {/* Timestamp — only on last in group */}
         {msg.isLast && (
           <span style={{
-            fontFamily: '"DM Sans", system-ui', fontSize: 10, color: '#BCC0C4',
+            fontFamily: '"Instrument Sans", system-ui', fontSize: 10, color: '#BCC0C4',
             marginLeft: isOwn ? 0 : 12, marginRight: isOwn ? 4 : 0,
           }}>
             {formatDistanceToNow(new Date(msg.created_at), { addSuffix: true })}
