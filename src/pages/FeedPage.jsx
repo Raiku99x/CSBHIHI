@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import PostCard from '../components/PostCard'
@@ -11,7 +11,7 @@ function dicebearUrl(name = '') {
   const hex = AVATAR_HEX[Math.max(0, c.charCodeAt(0) - 65) % AVATAR_HEX.length]
   return `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name || 'U')}&backgroundColor=${hex}&textColor=ffffff`
 }
-import { Image, Megaphone, Video } from 'lucide-react'
+import { Image, Megaphone, Paperclip } from 'lucide-react'
 
 export default function FeedPage() {
   const { user, profile } = useAuth()
@@ -20,6 +20,11 @@ export default function FeedPage() {
   const [loading, setLoading] = useState(true)
   const [showCreate, setShowCreate] = useState(false)
   const [createType, setCreateType] = useState('status')
+  const [createSubType, setCreateSubType] = useState('status')
+
+  // Hidden file inputs on FeedPage — clicking these triggers the modal + auto-fires the picker
+  const photoInputRef = useRef()
+  const fileInputRef = useRef()
 
   const fetchPosts = useCallback(async () => {
     const { data } = await supabase
@@ -54,9 +59,34 @@ export default function FeedPage() {
     return () => supabase.removeChannel(channel)
   }, [fetchPosts])
 
-  function openCreate(type = 'status') {
+  function openCreate(type = 'status', subType = 'status') {
     setCreateType(type)
+    setCreateSubType(subType)
     setShowCreate(true)
+  }
+
+  // Photo button: open native file picker first, then open modal with those files pre-loaded
+  // Since CreatePostModal manages its own refs, we open modal with a hint and let it handle it.
+  // We pass autoOpenPhoto / autoOpenFile props so modal can trigger its own picker on mount.
+  const [autoOpenPhoto, setAutoOpenPhoto] = useState(false)
+  const [autoOpenFile, setAutoOpenFile] = useState(false)
+
+  function handlePhotoClick() {
+    setAutoOpenPhoto(true)
+    setAutoOpenFile(false)
+    openCreate('status', 'status')
+  }
+
+  function handleFileClick() {
+    setAutoOpenFile(true)
+    setAutoOpenPhoto(false)
+    openCreate('status', 'material')
+  }
+
+  function handleModalClose() {
+    setShowCreate(false)
+    setAutoOpenPhoto(false)
+    setAutoOpenFile(false)
   }
 
   const firstName = profile?.display_name?.split(' ')[0] || 'there'
@@ -79,7 +109,7 @@ export default function FeedPage() {
             style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, background: '#E4E6EB' }}
           />
           <button
-            onClick={() => openCreate('status')}
+            onClick={() => openCreate('status', 'status')}
             style={{
               flex: 1, height: 40,
               background: '#F0F2F5', border: '1px solid #E4E6EB',
@@ -102,19 +132,19 @@ export default function FeedPage() {
         {/* Action buttons row */}
         <div style={{ display: 'flex', padding: '6px 8px' }}>
           <ComposeAction
-            icon={<Video size={20} color="#E41E3F" />}
-            label="Live Video"
-            onClick={() => openCreate('status')}
+            icon={<Paperclip size={20} color="#1877F2" />}
+            label="File"
+            onClick={handleFileClick}
           />
           <ComposeAction
             icon={<Image size={20} color="#45BD62" />}
             label="Photo/Video"
-            onClick={() => openCreate('status')}
+            onClick={handlePhotoClick}
           />
           <ComposeAction
             icon={<Megaphone size={20} color="#0D7377" />}
             label="Announce"
-            onClick={() => openCreate('announcement')}
+            onClick={() => openCreate('announcement', 'reminder')}
           />
         </div>
       </div>
@@ -125,7 +155,7 @@ export default function FeedPage() {
           {Array.from({ length: 3 }).map((_, i) => <PostSkeleton key={i} />)}
         </div>
       ) : posts.length === 0 ? (
-        <EmptyFeed onPost={() => openCreate('status')} />
+        <EmptyFeed onPost={() => openCreate('status', 'status')} />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {posts.map(post => (
@@ -136,10 +166,13 @@ export default function FeedPage() {
 
       {showCreate && (
         <CreatePostModal
-          onClose={() => setShowCreate(false)}
+          onClose={handleModalClose}
           onCreated={() => {}}
           subjects={subjects}
           defaultType={createType}
+          defaultSubType={createSubType}
+          autoOpenPhoto={autoOpenPhoto}
+          autoOpenFile={autoOpenFile}
         />
       )}
     </div>
