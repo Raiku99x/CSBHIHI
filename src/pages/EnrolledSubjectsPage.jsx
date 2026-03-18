@@ -10,12 +10,12 @@ import {
 import toast from 'react-hot-toast'
 
 const SUBJECT_COLORS = [
-  { bg: '#E6F4F4', icon: '#0D7377', bar: 'linear-gradient(135deg,#0D7377,#0A5C60)' },
-  { bg: '#FDF4FF', icon: '#9333ea', bar: 'linear-gradient(135deg,#9333ea,#c026d3)' },
-  { bg: '#F0FDF4', icon: '#16a34a', bar: 'linear-gradient(135deg,#16a34a,#15803d)' },
-  { bg: '#FFFBEB', icon: '#d97706', bar: 'linear-gradient(135deg,#d97706,#b45309)' },
-  { bg: '#FFF1F2', icon: '#e11d48', bar: 'linear-gradient(135deg,#e11d48,#be123c)' },
-  { bg: '#F0F9FF', icon: '#0284c7', bar: 'linear-gradient(135deg,#0284c7,#0369a1)' },
+  { bg: '#E0F0F0', icon: '#0D7377', bar: 'linear-gradient(135deg,#0D7377,#0A5C60)' }, // jade
+  { bg: '#DDE4EA', icon: '#3D5166', bar: 'linear-gradient(135deg,#3D5166,#2C3E50)' }, // slate
+  { bg: '#D8EDE6', icon: '#2D6A4F', bar: 'linear-gradient(135deg,#2D6A4F,#1B4332)' }, // forest
+  { bg: '#DCEAF5', icon: '#2E5F8A', bar: 'linear-gradient(135deg,#2E5F8A,#1A3A5C)' }, // steel
+  { bg: '#EDE4D8', icon: '#7A5C42', bar: 'linear-gradient(135deg,#7A5C42,#4A3728)' }, // brown
+  { bg: '#E4E0EB', icon: '#5C4A7A', bar: 'linear-gradient(135deg,#5C4A7A,#3D2B5E)' }, // muted violet
 ]
 
 function getColor(name) {
